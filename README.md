@@ -1,6 +1,9 @@
-# Gerenciador de Fazenda (Estância)
+# Fazenda Ativa
 
-Aplicação para gestão de uma estância com foco em **gado bovino** e **galinhas**.
+![Fazenda Ativa](marca/fazenda-ativa-horizontal.svg)
+
+Aplicação para gestão de fazendas e estâncias com foco em **gado bovino** e **galinhas**.
+A identidade visual (logo, cores e regras de uso) está em [`marca/`](marca/README.md).
 
 - **Front-end:** React + TypeScript + Vite, instalável no celular (PWA) e **funciona sem internet**.
 - **Back-end:** Netlify Functions + **Netlify Database** (PostgreSQL), com login e vários usuários.
@@ -88,6 +91,15 @@ Para relatórios direto no banco há visões prontas: `v_bovinos`, `v_pesagens`,
 
 Alertas automáticos: doses atrasadas ou próximas, partos previstos, estoque abaixo do mínimo,
 tarefas atrasadas, mortalidade alta em lotes de aves, lote sem registro recente e contas vencidas.
+
+## Manual de uso
+
+O manual para o cliente está em [`docs/manual/Manual-Fazenda-Ativa.pdf`](docs/manual/Manual-Fazenda-Ativa.pdf).
+O texto fica em `docs/manual/manual.html`. Para regerar:
+
+1. `npm run build` e, com o banco local vazio, `npm run preview` (em outro terminal).
+2. `npm run manual:telas` captura as telas com a estância de demonstração.
+3. `npm run manual:pdf` gera o PDF (requer `poppler-utils` e `pip install pypdf`).
 
 ## Estrutura
 

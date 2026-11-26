@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Icone, type NomeIcone } from './Icone';
+import { NomeMarca, Simbolo } from './Logo';
 import { useFazenda } from '@/store/useFazenda';
 import { gerarAlertas } from '@/lib/alertas';
 import { StatusSync } from './StatusSync';
@@ -44,7 +45,10 @@ export function Layout() {
   const s = useFazenda();
   const criticos = useMemo(() => gerarAlertas(s).filter((a) => a.nivel !== 'info').length, [s]);
 
-  useEffect(() => setAberta(false), [local.pathname]);
+  useEffect(() => {
+    setAberta(false);
+    window.scrollTo(0, 0); // cada tela começa no topo
+  }, [local.pathname]);
 
   useEffect(() => {
     const raiz = document.documentElement;
@@ -69,10 +73,10 @@ export function Layout() {
       {aberta && <div className="overlay" onClick={() => setAberta(false)} />}
       <aside className={`sidebar ${aberta ? 'aberta' : ''}`}>
         <div className="brand">
-          <Icone nome="casa" tamanho={26} />
-          <div>
-            <strong>{nome || 'Minha Estância'}</strong>
-            <small>Gerenciador de Fazenda</small>
+          <Simbolo tamanho={34} />
+          <div style={{ minWidth: 0 }}>
+            <NomeMarca claro />
+            <small>{nome || 'Minha Estância'}</small>
           </div>
         </div>
         <nav>
@@ -104,7 +108,7 @@ export function Layout() {
           <button className="icon-btn" onClick={() => setAberta(true)} aria-label="Abrir menu">
             <Icone nome="menu" tamanho={22} />
           </button>
-          <strong>{nome}</strong>
+          <span className="marca-topo"><Simbolo tamanho={26} /><strong>{nome}</strong></span>
           <StatusSync />
         </div>
         <main className="content">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, ErroApi } from '@/sync/api';
 import { iniciarSessao, useSync } from '@/sync/motor';
 import { useFazenda } from '@/store/useFazenda';
-import { Icone } from '@/components/Icone';
+import { NomeMarca, Simbolo } from '@/components/Logo';
 import { Campo } from '@/components/ui';
 
 type Modo = 'carregando' | 'login' | 'cadastro' | 'offline';
@@ -62,10 +62,10 @@ export default function Entrar({ reautenticar, onAdiar }: { reautenticar?: boole
     <div className="entrar">
       <div className="entrar-cartao card">
         <div className="entrar-marca">
-          <Icone nome="casa" tamanho={30} />
+          <Simbolo tamanho={48} />
           <div>
-            <strong>Gerenciador da Estância</strong>
-            <small>Bovinos · Aves · Gestão</small>
+            <NomeMarca />
+            <small>Gestão de gado e aves</small>
           </div>
         </div>
 

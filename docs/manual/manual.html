@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Fazenda Ativa — Manual de uso</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 20mm 17mm; }
+  :root {
+    --campo: #2F5D34; --mata: #1F3A22; --broto: #9CC56B; --ambar: #E8A33D; --creme: #F6F1E4; --carvao: #22261F;
+    --cinza: #5d6356; --linha: #e2dac6; --fundo-tab: #f8f4ea;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font: 10pt/1.5 Inter, sans-serif; color: var(--carvao); }
+  h1, h2, h3 { font-family: 'Inter Display', Inter, sans-serif; letter-spacing: -0.01em; line-height: 1.2; }
+  h2 { font-size: 20pt; margin: 0 0 4mm; color: var(--mata); break-before: page; break-after: avoid; }
+  h2 .num { color: var(--campo); font-weight: 800; margin-right: 3mm; }
+  h3 { font-size: 12pt; margin: 5mm 0 1.5mm; color: var(--campo); break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  .lead { font-size: 10.5pt; color: #3a4034; margin-bottom: 4mm; }
+  strong { font-weight: 650; }
+  ol, ul { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin-bottom: 1mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9pt; break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  th { text-align: left; background: var(--campo); color: #fff; font-weight: 600; padding: 2mm 2.5mm; }
+  td { padding: 1.5mm 2.5mm; border-bottom: 1px solid var(--linha); vertical-align: top; }
+  tbody tr:nth-child(even) td { background: var(--fundo-tab); }
+  td:first-child { font-weight: 600; }
+  figure { margin: 3mm 0 5mm; break-inside: avoid; }
+  figure img { width: 100%; max-width: 150mm; margin: 0 auto; display: block; border: 1px solid var(--linha); border-radius: 2.5mm; }
+  figure figcaption { max-width: 150mm; margin-left: auto; margin-right: auto; }
+  figcaption { font-size: 8.5pt; color: var(--cinza); margin-top: 1.5mm; }
+  figcaption b { color: var(--campo); }
+  .celulares { display: flex; gap: 8mm; justify-content: center; break-inside: avoid; margin: 3mm 0 5mm; }
+  .celulares figure { margin: 0; width: 52mm; }
+  .celulares img { border-radius: 5mm; }
+  .caixa { border-left: 1.2mm solid var(--campo); background: #eef3e9; padding: 3mm 4mm; border-radius: 0 2mm 2mm 0; margin: 3mm 0 4mm; break-inside: avoid; }
+  .caixa.atencao { border-color: var(--ambar); background: #fbf1df; }
+  .caixa b:first-child { display: block; margin-bottom: 0.5mm; color: var(--mata); }
+  .formula { font-family: 'Inter Display', Inter; font-size: 10.5pt; background: var(--fundo-tab); border: 1px solid var(--linha); border-radius: 2mm; padding: 2.5mm 4mm; margin: 2mm 0; break-inside: avoid; }
+  .formula span { color: var(--campo); font-weight: 700; }
+  .faq dt { font-weight: 650; color: var(--mata); margin-top: 2mm; break-after: avoid; }
+  .faq dd { margin: 0.5mm 0 0; }
+  .chip { display: inline-block; padding: 0 2mm; border-radius: 3mm; font-size: 8.5pt; font-weight: 600; }
+  .chip.verde { background: #e3edde; color: var(--campo); }
+  .chip.amarelo { background: #fbefd6; color: #94620a; }
+  .chip.vermelho { background: #f8e1dd; color: #a33328; }
+  .chip.azul { background: #e1edf6; color: #2f6690; }
+  .chip.cinza { background: #ececea; color: #5d6356; }
+
+  /* Capa */
+  .capa { height: 261mm; margin: -18mm -17mm 0; padding: 26mm 22mm; background: var(--mata); color: var(--creme); display: flex; flex-direction: column; break-after: page; position: relative; overflow: hidden; }
+  .capa .logo svg { width: 100mm; height: auto; }
+  .capa h1 { font-size: 40pt; margin: 32mm 0 4mm; color: #fff; font-weight: 800; letter-spacing: -0.02em; }
+  .capa .sub { font-size: 14pt; color: #cfdcc6; max-width: 105mm; line-height: 1.4; }
+  .capa .tel { position: absolute; right: 22mm; bottom: 30mm; width: 62mm; border-radius: 7mm; border: 2.5mm solid #0f1d11; box-shadow: 0 6mm 16mm rgba(0,0,0,.35); }
+  .capa .rodape { margin-top: auto; font-size: 10pt; color: #b9c8ae; }
+  .capa .rodape b { color: var(--broto); }
+  .capa .broto { position: absolute; right: -30mm; top: -30mm; width: 120mm; height: 120mm; border-radius: 50%; background: var(--campo); opacity: .55; }
+
+  /* Sumário */
+  .sumario h2 { break-before: auto; }
+  .sumario ol { list-style: none; padding: 0; margin: 6mm 0 0; }
+  .sumario li { display: flex; align-items: baseline; gap: 2mm; font-size: 11pt; padding: 2.2mm 0; border-bottom: 1px solid var(--linha); margin: 0; }
+  .sumario li .n { color: var(--campo); font-weight: 800; width: 8mm; }
+  .sumario li .t { flex: 1; }
+  .sumario li .p { font-weight: 600; color: var(--cinza); }
+  .sumario .intro { margin-top: 10mm; color: var(--cinza); font-size: 9.5pt; }
+  .diagrama { break-inside: avoid; margin: 3mm 0 5mm; }
+  .diagrama svg { width: 100%; height: auto; }
+</style>
+</head>
+<body>
+
+<section class="capa">
+  <div class="broto"></div>
+  <div class="logo" style="position:relative">{{LOGO_NEGATIVO}}</div>
+  <h1 style="position:relative">Manual de uso</h1>
+  <div class="sub" style="position:relative">Gestão de gado e aves no computador e no celular, com ou sem internet.</div>
+  <img class="tel" src="imagens/celular-painel.jpg" alt="">
+  <div class="rodape" style="position:relative"><b>Fazenda Ativa</b> · Versão 1.0 · novembro de 2026</div>
+</section>
+
+<section class="sumario">
+  <h2>Sumário</h2>
+  <ol>
+    <li><span class="n">1</span><span class="t">Introdução</span><span class="p" data-pag="s1">00</span></li>
+    <li><span class="n">2</span><span class="t">Primeiros passos</span><span class="p" data-pag="s2">00</span></li>
+    <li><span class="n">3</span><span class="t">Navegação e sincronização</span><span class="p" data-pag="s3">00</span></li>
+    <li><span class="n">4</span><span class="t">Painel</span><span class="p" data-pag="s4">00</span></li>
+    <li><span class="n">5</span><span class="t">Bovinos: rebanho e ficha do animal</span><span class="p" data-pag="s5">00</span></li>
+    <li><span class="n">6</span><span class="t">Bovinos: pesagens</span><span class="p" data-pag="s6">00</span></li>
+    <li><span class="n">7</span><span class="t">Bovinos: reprodução e leite</span><span class="p" data-pag="s7">00</span></li>
+    <li><span class="n">8</span><span class="t">Aves: lotes e produção diária</span><span class="p" data-pag="s8">00</span></li>
+    <li><span class="n">9</span><span class="t">Sanidade</span><span class="p" data-pag="s9">00</span></li>
+    <li><span class="n">10</span><span class="t">Pastagens e estoque</span><span class="p" data-pag="s10">00</span></li>
+    <li><span class="n">11</span><span class="t">Financeiro</span><span class="p" data-pag="s11">00</span></li>
+    <li><span class="n">12</span><span class="t">Agenda e equipe</span><span class="p" data-pag="s12">00</span></li>
+    <li><span class="n">13</span><span class="t">Configurações</span><span class="p" data-pag="s13">00</span></li>
+    <li><span class="n">14</span><span class="t">Como o app calcula</span><span class="p" data-pag="s14">00</span></li>
+    <li><span class="n">15</span><span class="t">Rotina sugerida e dúvidas frequentes</span><span class="p" data-pag="s15">00</span></li>
+  </ol>
+  <p class="intro">As telas deste manual mostram a estância de demonstração que acompanha o app. Os nomes, números e animais são fictícios.</p>
+</section>
+
+<section>
+  <h2 data-sec="s1"><span class="num">1</span>Introdução</h2>
+  <p class="lead">A Fazenda Ativa controla o gado, as galinhas, a sanidade, os pastos, o estoque e o dinheiro da estância em um só lugar, no computador ou no celular, com ou sem internet.</p>
+  <p>Este manual segue a ordem do menu lateral. Cada capítulo explica para que serve a tela, como fazer as tarefas mais comuns e o que o app calcula sozinho. No fim estão as referências de cálculo, uma rotina sugerida e as dúvidas frequentes.</p>
+  <table>
+    <thead><tr><th>Área do menu</th><th>Telas</th><th>Para que serve</th></tr></thead>
+    <tbody>
+      <tr><td>Painel</td><td>Painel</td><td>Visão geral do dia: números principais, alertas e tarefas</td></tr>
+      <tr><td>Bovinos</td><td>Rebanho, Pesagens, Reprodução, Leite</td><td>Cadastro de cada animal pelo brinco, peso, ciclo reprodutivo e ordenha</td></tr>
+      <tr><td>Aves</td><td>Lotes de aves, Produção diária</td><td>Lotes de postura e corte, ovos, mortalidade e ração</td></tr>
+      <tr><td>Manejo</td><td>Sanidade, Pastagens, Estoque</td><td>Vacinas e remédios, piquetes e lotação, insumos</td></tr>
+      <tr><td>Gestão</td><td>Financeiro, Agenda, Equipe, Configurações</td><td>Receitas e despesas, tarefas, funcionários, contas de acesso e backup</td></tr>
+    </tbody>
+  </table>
+  <figure><img src="imagens/painel.jpg" alt=""><figcaption><b>Figura 1.</b> O Painel, tela inicial do app no computador.</figcaption></figure>
+</section>
+
+<section>
+  <h2 data-sec="s2"><span class="num">2</span>Primeiros passos</h2>
+  <p class="lead">No primeiro acesso, crie a estância logo após publicar o site: a primeira pessoa que abrir o endereço vira a administradora.</p>
+  <h3>Criar a estância (uma única vez)</h3>
+  <ol>
+    <li>Abra o endereço do site no navegador.</li>
+    <li>Preencha nome da estância, seu nome, e-mail e uma senha de pelo menos 8 caracteres.</li>
+    <li>Toque em <strong>Criar estância</strong>. Você entra como <strong>administrador</strong>.</li>
+    <li>A estância começa vazia. Para explorar o app antes de lançar dados reais, use <strong>Configurações › Carregar demonstração</strong> e depois <strong>Começar do zero</strong>.</li>
+  </ol>
+  <p>Depois desse cadastro, a tela inicial passa a mostrar só o login. Ninguém mais consegue criar outra estância.</p>
+  <figure style="width:120mm;margin-left:auto;margin-right:auto"><img src="imagens/cadastro.jpg" alt="" style="height:70mm;object-fit:cover;object-position:center"><figcaption><b>Figura 2.</b> Tela de criação da estância, exibida só no primeiro acesso.</figcaption></figure>
+  <h3>Instalar no iPhone</h3>
+  <ol>
+    <li>Abra o site no <strong>Safari</strong> (não funciona pelo Chrome no iPhone).</li>
+    <li>Toque em <strong>Compartilhar</strong> (quadrado com seta para cima).</li>
+    <li>Escolha <strong>Adicionar à Tela de Início</strong> e confirme.</li>
+    <li>Use sempre o ícone <strong>Fazenda Ativa</strong> da tela inicial: ele abre em tela cheia e funciona sem sinal.</li>
+  </ol>
+  <p>No Android, o Chrome oferece <strong>Instalar app</strong> no menu de três pontos. No computador, basta deixar o site salvo nos favoritos.</p>
+  <h3>Dar acesso a outras pessoas</h3>
+  <ol>
+    <li>Entre como administrador e vá em <strong>Configurações › Usuários › + Usuário</strong>.</li>
+    <li>Informe nome, e-mail (que será o login), uma senha inicial e o papel.</li>
+    <li>Passe o e-mail e a senha para a pessoa. Ela pode trocar a senha em <strong>Configurações › Trocar senha</strong>.</li>
+  </ol>
+  <table>
+    <thead><tr><th style="width:32mm">Papel</th><th>Pode fazer</th></tr></thead>
+    <tbody>
+      <tr><td>Administrador</td><td>Tudo, inclusive criar e desativar usuários, importar backup, carregar demonstração e apagar todos os dados</td></tr>
+      <tr><td>Membro</td><td>Registrar e consultar tudo: animais, pesagens, aves, sanidade, estoque, financeiro, agenda</td></tr>
+    </tbody>
+  </table>
+  <h3>Entrar e sair</h3>
+  <ul>
+    <li><strong>Entrar:</strong> e-mail e senha. O login vale por 90 dias no aparelho.</li>
+    <li><strong>Sair:</strong> em <strong>Configurações › Conta e sincronização › Sair</strong>. Os dados são apagados do aparelho, mas continuam no servidor. Se houver alterações ainda não enviadas, o app avisa antes.</li>
+    <li><strong>Sessão expirada:</strong> o app pede a senha de novo e guarda tudo o que estava pendente. Se estiver sem tempo, toque em <strong>Continuar sem sincronizar por enquanto</strong> e entre depois.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 data-sec="s3"><span class="num">3</span>Navegação e sincronização</h2>
+  <p class="lead">O app funciona igual com ou sem internet: tudo o que você lança é gravado primeiro no aparelho e enviado ao servidor assim que houver sinal.</p>
+  <h3>Menu</h3>
+  <ul>
+    <li><strong>Computador:</strong> o menu fica sempre à esquerda, agrupado em Bovinos, Aves, Manejo e Gestão.</li>
+    <li><strong>Celular:</strong> toque nas três linhas no canto superior esquerdo para abrir o menu.</li>
+    <li><strong>Tema escuro:</strong> botão no rodapé do menu. Por padrão o app segue o tema do aparelho.</li>
+    <li>Em quase todas as tabelas, o <strong>lápis</strong> edita a linha e a <strong>lixeira</strong> exclui (sempre com confirmação).</li>
+  </ul>
+  <h3>Como os dados circulam</h3>
+  <div class="diagrama">{{DIAGRAMA}}</div>
+  <p>O lançamento nunca espera a internet: ele fica no aparelho e sobe na próxima sincronização. O app sincroniza sozinho ao abrir, quando a internet volta, a cada 30 segundos e logo depois de cada alteração.</p>
+  <div class="celulares">
+    <figure><img src="imagens/celular-menu.jpg" alt=""><figcaption><b>Figura 3.</b> Menu no celular.</figcaption></figure>
+    <figure><img src="imagens/celular-offline.jpg" alt=""><figcaption><b>Figura 4.</b> Sem internet: o animal cadastrado aguarda na fila ("1 a enviar").</figcaption></figure>
+  </div>
+  <h3>Indicador de sincronização</h3>
+  <p>Fica no rodapé do menu (computador) ou no topo da tela (celular). Toque nele para sincronizar na hora.</p>
+  <table>
+    <thead><tr><th style="width:44mm">Indicador</th><th>Significado</th><th>O que fazer</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip verde">Sincronizado</span></td><td>Tudo enviado e recebido</td><td>Nada</td></tr>
+      <tr><td><span class="chip amarelo">N a enviar</span></td><td>Há alterações esperando para subir</td><td>Normal logo após lançar. Some em segundos com internet</td></tr>
+      <tr><td><span class="chip amarelo">Sincronizando…</span></td><td>Conversando com o servidor</td><td>Aguarde</td></tr>
+      <tr><td><span class="chip cinza">Sem internet · N a enviar</span></td><td>Aparelho offline, alterações guardadas</td><td>Continue usando. Sobe sozinho quando o sinal voltar</td></tr>
+      <tr><td><span class="chip vermelho">Erro ao sincronizar</span></td><td>O servidor recusou ou falhou</td><td>Toque para tentar de novo. Se continuar, avise o administrador</td></tr>
+      <tr><td><span class="chip vermelho">Sessão expirada</span></td><td>O login venceu</td><td>Entre de novo. Nada do que está na fila se perde</td></tr>
+    </tbody>
+  </table>
+  <div class="caixa atencao"><b>Cuidados</b>
+    O primeiro acesso em um aparelho precisa de internet para baixar os dados. <strong>Não saia da conta</strong> com alterações na fila: sair apaga os dados do aparelho (o app avisa antes). No iPhone, abra sempre pelo ícone da tela inicial: sites abertos só pelo Safari podem ter os dados locais apagados pelo sistema depois de alguns dias sem uso.
+  </div>
+</section>
+
+<section>
+  <h2 data-sec="s4"><span class="num">4</span>Painel</h2>
+  <p class="lead">O Painel é a primeira tela e mostra, num relance, como está a estância hoje e o que precisa de atenção. Nada é digitado aqui: tudo vem das outras telas.</p>
+  <h3>Indicadores do topo</h3>
+  <table>
+    <thead><tr><th style="width:42mm">Indicador</th><th>O que mostra</th><th>De onde vem</th></tr></thead>
+    <tbody>
+      <tr><td>Bovinos ativos</td><td>Cabeças no rebanho, total em UA e vacas prenhes</td><td>Rebanho, pesagens e reprodução</td></tr>
+      <tr><td>Lotação</td><td>UA por hectare nos pastos marcados como "em uso"</td><td>Pesos atuais ÷ área dos pastos em uso</td></tr>
+      <tr><td>Valor estimado do rebanho</td><td>Arrobas estimadas × preço da arroba</td><td>Peso atual de cada animal e o preço em Configurações</td></tr>
+      <tr><td>Aves alojadas</td><td>Aves vivas nos lotes ativos</td><td>Quantidade alojada menos as mortes registradas</td></tr>
+      <tr><td>Ovos / dia</td><td>Média dos últimos 7 dias e dúzias por dia</td><td>Produção diária das aves</td></tr>
+      <tr><td>Resultado do mês</td><td>Receitas menos despesas do mês e dos últimos 12 meses</td><td>Financeiro</td></tr>
+    </tbody>
+  </table>
+  <h3>Alertas</h3>
+  <p>A lista de alertas junta tudo o que precisa de ação. Toque num alerta para ir direto à tela certa. O número vermelho ao lado de <strong>Painel</strong> no menu conta os alertas críticos e de atenção.</p>
+  <table>
+    <thead><tr><th style="width:42mm">Cor</th><th>Significado</th><th>Exemplos</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip vermelho">Crítico</span></td><td>Atrasado ou grave</td><td>Dose de vacina vencida, item de estoque zerado, mortalidade alta num lote de aves</td></tr>
+      <tr><td><span class="chip amarelo">Atenção</span></td><td>Vence em até 7 dias ou já passou do prazo</td><td>Vacina na semana, estoque abaixo do mínimo, tarefa atrasada, conta vencida</td></tr>
+      <tr><td><span class="chip azul">Informação</span></td><td>Próximo, sem urgência</td><td>Vacina em 8 a 15 dias, parto em até 30 dias, lote sem registro recente</td></tr>
+    </tbody>
+  </table>
+  <h3>Gráficos e quadros</h3>
+  <ul>
+    <li><strong>Receitas x despesas:</strong> barras dos últimos 12 meses. Passe o dedo ou o mouse sobre a barra para ver o valor.</li>
+    <li><strong>Produção de ovos:</strong> ovos coletados por dia nos últimos 30 dias.</li>
+    <li><strong>Composição do rebanho:</strong> quantos animais há em cada categoria (vaca, novilha, garrote, bezerro etc.).</li>
+    <li><strong>Próximas tarefas:</strong> as 6 tarefas pendentes mais próximas da Agenda.</li>
+    <li><strong>Lotes de aves:</strong> idade, aves vivas, mortalidade e taxa de postura de cada lote ativo.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 data-sec="s5"><span class="num">5</span>Bovinos: rebanho e ficha do animal</h2>
+  <p class="lead">Cada bovino é cadastrado individualmente pelo número do brinco. A partir dele o app acompanha idade, categoria, peso, reprodução e sanidade.</p>
+  <figure><img src="imagens/rebanho.jpg" alt=""><figcaption><b>Figura 5.</b> Lista do rebanho com busca, filtros e a situação reprodutiva de cada fêmea.</figcaption></figure>
+  <h3>Cadastrar um animal</h3>
+  <p>Toque em <strong>Bovinos › Rebanho › + Novo animal</strong> e preencha os campos:</p>
+  <table>
+    <thead><tr><th style="width:46mm">Campo</th><th>Como usar</th></tr></thead>
+    <tbody>
+      <tr><td>Brinco / identificação</td><td>Obrigatório. Não pode repetir entre animais ativos</td></tr>
+      <tr><td>Nome</td><td>Opcional, comum para vacas e touros</td></tr>
+      <tr><td>Sexo, raça, nascimento</td><td>Definem a categoria e a idade. A raça pode ser digitada ou escolhida na lista</td></tr>
+      <tr><td>Finalidade</td><td>Corte, leite ou reprodução. Um macho adulto de reprodução aparece como touro; de corte, como boi</td></tr>
+      <tr><td>Origem</td><td>Nascido na estância ou comprado</td></tr>
+      <tr><td>Pasto / piquete</td><td>Onde o animal está. Alimenta a lotação de cada pasto</td></tr>
+      <tr><td>Mãe e pai</td><td>Genealogia. A mãe é escolhida entre as fêmeas cadastradas</td></tr>
+      <tr><td>Peso atual (kg)</td><td>Opcional. Se informado, já cria a primeira pesagem com a data de hoje</td></tr>
+    </tbody>
+  </table>
+  <p>A <strong>categoria</strong> (bezerro, bezerra, garrote, novilha, vaca, boi, touro) é calculada pelo app e muda sozinha conforme o animal envelhece ou pare.</p>
+  <figure><img src="imagens/novo-animal.jpg" alt=""><figcaption><b>Figura 6.</b> Formulário de cadastro de um animal.</figcaption></figure>
+  <h3>Encontrar animais</h3>
+  <p>Use a busca (brinco, nome ou raça) e os filtros de situação, sexo, categoria e pasto. O botão <strong>CSV</strong> baixa a lista filtrada para abrir no Excel. A coluna <strong>Situação</strong> mostra se a fêmea está vazia, coberta, prenhe ou parida.</p>
+  <h3>Venda ou morte: use "Saída", não "Excluir"</h3>
+  <ul>
+    <li><strong>Saída</strong> (na linha do animal ou na ficha) registra venda ou morte com data e motivo. O animal sai do rebanho ativo, mas o histórico fica guardado.</li>
+    <li>Na venda, se você informar o <strong>valor</strong>, o app lança a receita no Financeiro automaticamente.</li>
+    <li><strong>Excluir</strong> (lixeira) apaga o animal e todas as suas pesagens, eventos e manejos. Use só para corrigir um cadastro feito por engano.</li>
+  </ul>
+  <h3>Ficha do animal</h3>
+  <p>Toque no brinco para abrir a ficha. Ela mostra idade, peso atual em kg, arrobas e valor estimado, GMD recente e pasto; o gráfico da evolução de peso; mãe, pai e crias; as pesagens; os manejos sanitários, com aviso vermelho se o animal estiver em <strong>carência</strong>; e, nas fêmeas, o histórico reprodutivo. Os botões <strong>Editar</strong> e <strong>Registrar saída</strong> ficam no topo.</p>
+  <figure><img src="imagens/ficha-animal.jpg" alt=""><figcaption><b>Figura 7.</b> Ficha de uma vaca: indicadores, curva de peso, dados e históricos.</figcaption></figure>
+</section>
+
+<section>
+  <h2 data-sec="s6"><span class="num">6</span>Bovinos: pesagens</h2>
+  <p class="lead">As pesagens dão o peso atual de cada animal e, a partir da segunda, o ganho médio diário (GMD). Delas saem as arrobas, o valor do rebanho e a lotação dos pastos.</p>
+  <h3>Pesagem individual</h3>
+  <p><strong>Bovinos › Pesagens › + Nova pesagem</strong>, ou <strong>+ Pesagem</strong> na ficha do animal. Escolha o animal, a data e o peso em kg.</p>
+  <h3>Pesagem em lote (dia de tronco)</h3>
+  <ol>
+    <li><strong>Bovinos › Pesagens › Pesagem em lote.</strong></li>
+    <li>Escolha o pasto (ou todos os animais ativos) e a data.</li>
+    <li>A tela lista cada animal com o último peso ao lado. Digite o novo peso de quem passou na balança.</li>
+    <li>Toque em <strong>Salvar pesagens</strong>. Animais sem peso digitado são ignorados.</li>
+  </ol>
+  <figure><img src="imagens/pesagem-lote.jpg" alt=""><figcaption><b>Figura 8.</b> Pesagem em lote dos animais de um pasto.</figcaption></figure>
+  <h3>O que a tabela mostra</h3>
+  <table>
+    <thead><tr><th style="width:40mm">Coluna</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td>Peso</td><td>Peso vivo em kg</td></tr>
+      <tr><td>Arrobas</td><td>Estimativa de arrobas de carcaça (peso ÷ 30)</td></tr>
+      <tr><td>Ganho</td><td>Diferença em kg para a pesagem anterior do mesmo animal</td></tr>
+      <tr><td>GMD (kg/dia)</td><td>Ganho ÷ dias entre as duas pesagens</td></tr>
+    </tbody>
+  </table>
+  <div class="caixa"><b>Dica</b>Um GMD negativo indica perda de peso: vale olhar pasto, sanidade e água desse animal. Para corrigir um peso digitado errado, use o lápis da linha.</div>
+</section>
+
+<section>
+  <h2 data-sec="s7"><span class="num">7</span>Bovinos: reprodução e leite</h2>
+  <p class="lead">A tela de Reprodução acompanha cada vaca e novilha pelo ciclo cobertura → diagnóstico → parto e calcula a data prevista do parto (283 dias depois da cobertura ou inseminação).</p>
+  <h3>Registrar um evento</h3>
+  <p>Na aba <strong>Matrizes</strong>, toque em <strong>Registrar</strong> na linha da fêmea: o app já sugere o próximo passo (diagnóstico para uma coberta, parto para uma prenhe). Também dá para usar <strong>+ Novo evento</strong> ou <strong>+ Evento</strong> na ficha do animal.</p>
+  <table>
+    <thead><tr><th style="width:28mm">Evento</th><th>O que informar</th><th>O que muda</th></tr></thead>
+    <tbody>
+      <tr><td>Cobertura</td><td>Data e touro</td><td>Situação vira <span class="chip amarelo">coberta</span> e o parto previsto aparece</td></tr>
+      <tr><td>Inseminação</td><td>Data e sêmen ou touro</td><td>Igual à cobertura</td></tr>
+      <tr><td>Diagnóstico</td><td>Data e resultado (prenhe ou vazia)</td><td><span class="chip verde">prenhe</span> mantém o parto previsto; <span class="chip cinza">vazia</span> apaga a previsão</td></tr>
+      <tr><td>Parto</td><td>Data. Pode cadastrar o bezerro na hora (brinco e sexo)</td><td>Situação vira <span class="chip amarelo">parida</span>. O bezerro entra no rebanho com mãe, pai, raça e pasto preenchidos</td></tr>
+      <tr><td>Aborto</td><td>Data</td><td>Situação volta para vazia</td></tr>
+    </tbody>
+  </table>
+  <figure><img src="imagens/reproducao.jpg" alt=""><figcaption><b>Figura 9.</b> Matrizes ordenadas pelo parto previsto.</figcaption></figure>
+  <h3>Indicadores da reprodução</h3>
+  <ul>
+    <li><strong>Prenhes</strong> e quantas aguardam diagnóstico.</li>
+    <li><strong>Taxa de prenhez (12 meses):</strong> diagnósticos positivos ÷ total de diagnósticos no ano.</li>
+    <li><strong>Partos nos próximos 90 dias</strong>, para preparar piquete-maternidade e mão de obra.</li>
+    <li><strong>Intervalo entre partos (IEP):</strong> média de dias entre partos sucessivos de cada matriz.</li>
+  </ul>
+  <p>A aba <strong>Histórico de eventos</strong> lista tudo o que foi registrado, do mais novo ao mais antigo, para editar ou corrigir.</p>
+  <h3>Leite</h3>
+  <p><strong>Bovinos › Leite › Registrar ordenha:</strong> data, litros do dia e quantas vacas foram ordenhadas. A tela mostra a média diária dos últimos 7 dias, litros por vaca por dia, total do mês e o gráfico dos últimos 60 dias. A venda do leite é lançada no Financeiro, na categoria <strong>Venda de leite</strong>.</p>
+</section>
+
+<section>
+  <h2 data-sec="s8"><span class="num">8</span>Aves: lotes e produção diária</h2>
+  <p class="lead">As galinhas são controladas por lote (um grupo alojado junto, no mesmo galpão). O registro diário de ovos, mortes e ração alimenta todos os índices do lote.</p>
+  <h3>Criar um lote</h3>
+  <p><strong>Aves › Lotes de aves › + Novo lote.</strong></p>
+  <table>
+    <thead><tr><th style="width:46mm">Campo</th><th>Como usar</th></tr></thead>
+    <tbody>
+      <tr><td>Código</td><td>Nome curto do lote, por exemplo POST-01</td></tr>
+      <tr><td>Finalidade</td><td>Postura (ovos), corte (frango) ou matrizes</td></tr>
+      <tr><td>Raça / linhagem, galpão</td><td>Para identificar e filtrar</td></tr>
+      <tr><td>Alojamento e idade</td><td>Data de alojamento e idade das aves naquele dia. O app soma os dias e mostra a idade em semanas</td></tr>
+      <tr><td>Quantidade de aves</td><td>Aves alojadas. As mortes registradas são descontadas daqui</td></tr>
+      <tr><td>Situação</td><td>Ativo ou encerrado (lote vendido ou descartado). Encerrados somem das listas, mas ficam no histórico</td></tr>
+    </tbody>
+  </table>
+  <h3>Lançar o dia de todos os lotes de uma vez</h3>
+  <ol>
+    <li><strong>Aves › Produção diária.</strong></li>
+    <li>Confira a data no canto do quadro <strong>Lançamento do dia</strong>.</li>
+    <li>Para cada lote, digite ovos coletados, ovos de descarte (trincados, sujos), mortes e ração em kg. Lotes de corte não têm campo de ovos.</li>
+    <li>Toque em <strong>Salvar dia</strong>. Se a data já tinha registro, ele é atualizado em vez de duplicado.</li>
+  </ol>
+  <p>Se o número de ovos passar do número de aves vivas, o app pede confirmação, porque provavelmente é erro de digitação. A tela também mostra os totais dos últimos 7 dias, a receita potencial pelo preço da dúzia e um resumo por dia.</p>
+  <figure><img src="imagens/producao-diaria.jpg" alt=""><figcaption><b>Figura 10.</b> Lançamento do dia para todos os lotes.</figcaption></figure>
+  <h3>Ficha do lote</h3>
+  <p>Toque no código do lote para abrir a ficha.</p>
+  <table>
+    <thead><tr><th>Lote de postura</th><th>Lote de corte</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:400">Taxa de postura dos últimos 7 dias e gráfico diário</td><td>Peso médio das amostragens e gráfico</td></tr>
+      <tr><td style="font-weight:400">Ovos produzidos e valor estimado</td><td>Conversão alimentar (kg de ração por kg de peso vivo)</td></tr>
+      <tr><td style="font-weight:400">Ração gasta por dúzia de ovos</td><td>Ração consumida no total</td></tr>
+    </tbody>
+  </table>
+  <p>Nos dois tipos aparecem aves vivas, idade, mortalidade acumulada (em vermelho acima de 5%), os registros diários para corrigir e os manejos sanitários do lote. Nos lotes de corte, informe o <strong>peso médio (g)</strong> de uma amostra de aves uma vez por semana, pelo botão <strong>Registro diário</strong> da ficha.</p>
+  <figure><img src="imagens/ficha-lote.jpg" alt=""><figcaption><b>Figura 11.</b> Ficha de um lote de postura.</figcaption></figure>
+  <div class="caixa atencao"><b>Alertas das aves</b><strong>Mortalidade alta:</strong> mais de 2% do lote morreu nos últimos 7 dias. <strong>Lote sem registro recente:</strong> nenhum lançamento ontem nem hoje.</div>
+</section>
+
+<section>
+  <h2 data-sec="s9"><span class="num">9</span>Sanidade</h2>
+  <p class="lead">A Sanidade guarda cada vacina, vermífugo, medicamento e exame, avisa quando vence a próxima dose e mostra quem está em período de carência.</p>
+  <h3>Registrar um manejo</h3>
+  <p><strong>Manejo › Sanidade › + Novo manejo.</strong></p>
+  <table>
+    <thead><tr><th style="width:42mm">Campo</th><th>Como usar</th></tr></thead>
+    <tbody>
+      <tr><td>Espécie</td><td>Bovinos ou aves</td></tr>
+      <tr><td>Aplicação</td><td>Todo o rebanho (ou todas as aves), um animal pelo brinco ou um lote de aves</td></tr>
+      <tr><td>Tipo e produto</td><td>Vacina, vermífugo, medicamento, exame ou outro, e o nome do produto</td></tr>
+      <tr><td>Dose / via</td><td>Texto livre, por exemplo "2 ml subcutâneo"</td></tr>
+      <tr><td>Data da aplicação</td><td>Quando foi aplicado</td></tr>
+      <tr><td>Próxima dose</td><td>Gera o lembrete no Painel. Use os atalhos <strong>Repetir em 30, 90, 180 ou 365 dias</strong></td></tr>
+      <tr><td>Carência (dias)</td><td>Dias em que carne, leite ou ovos não podem ser vendidos</td></tr>
+      <tr><td>Responsável, observações</td><td>Quem aplicou e qualquer detalhe</td></tr>
+    </tbody>
+  </table>
+  <h3>Próximas doses</h3>
+  <p>A aba <strong>Próximas doses</strong> lista o que está programado, do mais urgente ao mais distante, com o prazo em dias. Quando aplicar, toque em <strong>Aplicar</strong> na linha: o formulário abre preenchido com o mesmo produto e alvo e a data de hoje. Basta informar a próxima dose e salvar.</p>
+  <p>O app considera só a aplicação mais recente de cada produto para cada alvo. Ao registrar a nova dose, o lembrete antigo some sozinho.</p>
+  <figure><img src="imagens/sanidade.jpg" alt=""><figcaption><b>Figura 12.</b> Próximas doses com prazo e o quadro de carências ativas.</figcaption></figure>
+  <h3>Carência</h3>
+  <p>Todo manejo com carência aparece no quadro <strong>Períodos de carência ativos</strong> até a data final, e a ficha do animal ganha um aviso vermelho.</p>
+  <div class="caixa atencao"><b>Antes de vender</b>Antes de vender ou abater um animal, ou vender leite ou ovos, confira o quadro de carências.</div>
+  <h3>Histórico</h3>
+  <p>A aba <strong>Histórico</strong> traz todos os manejos com produto, dose, alvo, carência e responsável. Use o filtro do topo para ver só bovinos ou só aves.</p>
+</section>
+
+<section>
+  <h2 data-sec="s10"><span class="num">10</span>Pastagens e estoque</h2>
+  <h3>Pastagens</h3>
+  <p>Cada piquete, potreiro ou invernada é cadastrado com nome, área em hectares, forrageira e situação (em uso, descanso ou reforma). O app soma os animais de cada pasto e calcula a lotação.</p>
+  <table>
+    <thead><tr><th style="width:30mm">Coluna</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td>Cabeças</td><td>Animais ativos com aquele pasto no cadastro</td></tr>
+      <tr><td>UA</td><td>Peso atual somado ÷ 450 kg</td></tr>
+      <tr><td>Lotação</td><td>UA ÷ área (UA/ha)</td></tr>
+      <tr><td>Ocupação</td><td>Barra comparando a lotação com 2 UA/ha: amarela acima de 80% e vermelha acima de 100%</td></tr>
+    </tbody>
+  </table>
+  <p>Um pasto em <strong>descanso</strong> ou <strong>reforma</strong> que ainda tenha animais ganha o aviso <span class="chip vermelho">com animais</span>. Para fazer o rodízio, edite o animal no Rebanho e troque o pasto. O indicador <strong>Animais sem pasto</strong> mostra quem ficou sem pasto definido.</p>
+  <figure><img src="imagens/pastagens.jpg" alt=""><figcaption><b>Figura 13.</b> Pastos com área, cabeças, UA e ocupação.</figcaption></figure>
+  <h3>Estoque</h3>
+  <p>O Estoque controla ração, sal mineral, vacinas, medicamentos, combustível e ferramentas, com saldo, estoque mínimo e custo.</p>
+  <ol>
+    <li><strong>Manejo › Estoque › + Novo item:</strong> nome, categoria, unidade (kg, saco, dose, L), saldo inicial, estoque mínimo e custo unitário.</li>
+    <li><strong>+ Entrada</strong> (compra): informe a quantidade. Deixe marcado <strong>Lançar despesa no financeiro</strong> e a compra vira despesa automaticamente, já com categoria e atividade sugeridas.</li>
+    <li><strong>− Saída</strong> (uso): informe a quantidade e o destino. O saldo diminui.</li>
+  </ol>
+  <p>Quando o saldo chega ao mínimo, o item ganha a etiqueta <span class="chip vermelho">repor</span> e um alerta aparece no Painel. A aba <strong>Movimentações</strong> mostra todas as entradas e saídas. Excluir uma movimentação desfaz o efeito dela no saldo.</p>
+  <figure><img src="imagens/estoque.jpg" alt=""><figcaption><b>Figura 14.</b> Itens de estoque com nível em relação ao mínimo.</figcaption></figure>
+</section>
+
+<section>
+  <h2 data-sec="s11"><span class="num">11</span>Financeiro</h2>
+  <p class="lead">O Financeiro registra receitas e despesas separadas por atividade (bovinos, aves ou geral) e mostra o resultado de cada uma, além das contas a pagar e a receber.</p>
+  <h3>Lançar</h3>
+  <p>Use <strong>+ Receita</strong> ou <strong>+ Despesa</strong> e preencha categoria, atividade, valor, descrição e data (ou vencimento). Deixe <strong>Já pago</strong> / <strong>Já recebido</strong> desmarcado para contas futuras: elas entram como pendentes.</p>
+  <p>Alguns lançamentos são criados sozinhos por outras telas:</p>
+  <table>
+    <thead><tr><th>Ação</th><th>Lançamento criado</th></tr></thead>
+    <tbody>
+      <tr><td>Saída de animal por venda, com valor</td><td>Receita "Venda de gado" (bovinos)</td></tr>
+      <tr><td>Entrada no estoque com "Lançar despesa" marcado</td><td>Despesa da categoria do item (Ração, Sanidade, Combustível...)</td></tr>
+      <tr><td>Equipe › Lançar folha no financeiro</td><td>Despesa "Mão de obra" com a soma dos salários, pendente</td></tr>
+    </tbody>
+  </table>
+  <figure><img src="imagens/financeiro.jpg" alt=""><figcaption><b>Figura 15.</b> Resultado do período e fluxo mensal de receitas e despesas.</figcaption></figure>
+  <h3>Ler os números</h3>
+  <ul>
+    <li><strong>Período e atividade</strong> (no topo) filtram todos os quadros da tela.</li>
+    <li><strong>Resultado</strong> = receitas − despesas, com a margem em porcentagem.</li>
+    <li><strong>A pagar / a receber:</strong> soma de tudo o que está pendente, de qualquer período.</li>
+    <li><strong>Fluxo mensal:</strong> receitas e despesas dos últimos 12 meses.</li>
+    <li><strong>Resultado por atividade:</strong> mostra se bovinos e aves dão lucro separadamente. Custos que servem a tudo (diesel, manutenção, folha) ficam em <strong>geral</strong>.</li>
+    <li><strong>Por categoria:</strong> para onde vai e de onde vem o dinheiro.</li>
+  </ul>
+  <h3>Contas pendentes</h3>
+  <p>Na tabela de lançamentos, a situação aparece como <span class="chip verde">pago / recebido</span>, <span class="chip amarelo">pendente</span> ou <span class="chip vermelho">vencido</span>. Toque na etiqueta para marcar como pago. Despesas vencidas geram um alerta no Painel. Marque <strong>Só pendentes</strong> para ver apenas o que falta acertar.</p>
+</section>
+
+<section>
+  <h2 data-sec="s12"><span class="num">12</span>Agenda e equipe</h2>
+  <h3>Agenda</h3>
+  <p>A Agenda guarda as tarefas da estância: consertos, rodízio de pasto, compras, vacinações combinadas.</p>
+  <ol>
+    <li><strong>Gestão › Agenda › + Nova tarefa:</strong> título, data, prioridade (alta, média, baixa), área (bovinos, aves, pastagens, manutenção, geral), responsável e descrição.</li>
+    <li>As tarefas aparecem agrupadas em <strong>Atrasadas</strong>, <strong>Hoje</strong>, <strong>Próximos 7 dias</strong> e <strong>Mais tarde</strong>.</li>
+    <li>Marque a caixa da tarefa quando ela for feita. Para revê-las, ligue <strong>Mostrar concluídas</strong>.</li>
+  </ol>
+  <p>Tarefas atrasadas e do dia aparecem nos alertas do Painel, e as seis próximas ficam no quadro <strong>Próximas tarefas</strong>.</p>
+  <figure><img src="imagens/agenda.jpg" alt=""><figcaption><b>Figura 16.</b> Tarefas agrupadas por prazo.</figcaption></figure>
+  <h3>Equipe</h3>
+  <p>A Equipe é o cadastro de funcionários e peões: nome, função, telefone, admissão, salário e se está ativo. O botão <strong>Lançar folha no financeiro</strong> cria uma despesa pendente com a soma dos salários dos ativos.</p>
+  <div class="caixa"><b>Equipe não é acesso ao app</b>Para que um funcionário entre no sistema, crie também um usuário para ele em <strong>Configurações › Usuários</strong>.</div>
+</section>
+
+<section>
+  <h2 data-sec="s13"><span class="num">13</span>Configurações</h2>
+  <p class="lead">Em Configurações ficam os dados da estância, os preços usados nos cálculos, a sua conta, os usuários e o backup.</p>
+  <table>
+    <thead><tr><th style="width:40mm">Quadro</th><th>O que faz</th><th style="width:26mm">Quem vê</th></tr></thead>
+    <tbody>
+      <tr><td>Estância</td><td>Nome, proprietário, município, área total, <strong>preço da arroba</strong> e <strong>preço da dúzia de ovos</strong>. Os preços alimentam o valor do rebanho e a receita estimada dos ovos</td><td>Todos</td></tr>
+      <tr><td>Conta e sincronização</td><td>Seu nome e papel, situação da sincronização, <strong>Sincronizar agora</strong>, <strong>Trocar senha</strong> e <strong>Sair</strong></td><td>Todos</td></tr>
+      <tr><td>Backup dos dados</td><td><strong>Baixar backup (.json)</strong> salva uma cópia completa num arquivo</td><td>Todos</td></tr>
+      <tr><td>Importar backup</td><td>Substitui todos os dados da estância pelos do arquivo, para todos os usuários</td><td>Administrador</td></tr>
+      <tr><td>Dados de demonstração</td><td><strong>Carregar demonstração</strong> troca tudo por uma estância fictícia. <strong>Começar do zero</strong> apaga tudo. Valem para todos os usuários</td><td>Administrador</td></tr>
+      <tr><td>Usuários</td><td>Criar usuário, trocar o papel, definir nova senha, desativar ou reativar</td><td>Administrador</td></tr>
+      <tr><td>Referências de cálculo</td><td>Resumo das fórmulas usadas pelo app</td><td>Todos</td></tr>
+    </tbody>
+  </table>
+  <p>Desativar um usuário corta o acesso na hora, em todos os aparelhos dele. Os registros que ele fez continuam na estância.</p>
+  <div class="caixa"><b>Backup</b>Mesmo com tudo salvo no servidor, baixe um backup de vez em quando (por exemplo, uma vez por mês) e guarde o arquivo fora do celular.</div>
+  <figure><img src="imagens/configuracoes.jpg" alt="" style="max-height:92mm;object-fit:cover;object-position:top"><figcaption><b>Figura 17.</b> Configurações vistas pelo administrador.</figcaption></figure>
+</section>
+
+<section>
+  <h2 data-sec="s14"><span class="num">14</span>Como o app calcula</h2>
+  <p class="lead">Todos os números automáticos usam as referências abaixo. Os valores fixos (450 kg por UA, rendimento de carcaça de 50%, 283 dias de gestação, 2 UA/ha de referência) podem ser ajustados no sistema se a realidade da estância for outra.</p>
+  <h3>Bovinos</h3>
+  <table>
+    <thead><tr><th style="width:44mm">Item</th><th>Regra</th></tr></thead>
+    <tbody>
+      <tr><td>Idade</td><td>Meses completos desde o nascimento</td></tr>
+      <tr><td>Categoria (macho)</td><td>Menos de 12 meses: bezerro. De 12 a 24: garrote. Acima: touro (finalidade reprodução) ou boi</td></tr>
+      <tr><td>Categoria (fêmea)</td><td>Menos de 12 meses: bezerra. Depois: novilha, até o primeiro parto ou 36 meses, quando vira vaca</td></tr>
+      <tr><td>Peso atual</td><td>Última pesagem registrada</td></tr>
+      <tr><td>Parto previsto</td><td>Cobertura ou inseminação + 283 dias</td></tr>
+      <tr><td>Taxa de prenhez</td><td>Diagnósticos "prenhe" ÷ total de diagnósticos nos últimos 12 meses</td></tr>
+      <tr><td>Intervalo entre partos</td><td>Média de dias entre partos sucessivos da matriz</td></tr>
+    </tbody>
+  </table>
+  <div class="formula"><span>GMD (kg/dia)</span> = (peso atual − peso anterior) ÷ dias entre as pesagens</div>
+  <div class="formula"><span>Arrobas</span> = peso vivo × 0,50 ÷ 15 &nbsp;&nbsp;·&nbsp;&nbsp; <span>UA</span> = peso vivo ÷ 450 &nbsp;&nbsp;·&nbsp;&nbsp; <span>Lotação</span> = UA ÷ área (ha)</div>
+  <p>O valor estimado do rebanho é a soma das arrobas × o preço da arroba definido em Configurações.</p>
+  <h3>Aves</h3>
+  <table>
+    <thead><tr><th style="width:44mm">Item</th><th>Regra</th></tr></thead>
+    <tbody>
+      <tr><td>Aves vivas</td><td>Quantidade alojada − todas as mortes registradas</td></tr>
+      <tr><td>Idade</td><td>Idade no alojamento + dias desde o alojamento</td></tr>
+      <tr><td>Mortalidade acumulada</td><td>Mortes ÷ quantidade alojada</td></tr>
+      <tr><td>Taxa de postura</td><td>Ovos do dia ÷ aves vivas naquele dia, média dos últimos 7 registros</td></tr>
+      <tr><td>Ração por dúzia</td><td>Ração total (kg) ÷ (ovos ÷ 12)</td></tr>
+      <tr><td>Conversão alimentar</td><td>Lotes de corte: ração total (kg) ÷ (peso médio × aves vivas)</td></tr>
+    </tbody>
+  </table>
+  <h3>Prazos dos alertas</h3>
+  <table>
+    <thead><tr><th style="width:44mm">Alerta</th><th>Quando aparece</th></tr></thead>
+    <tbody>
+      <tr><td>Próxima dose</td><td>15 dias antes. Amarelo a 7 dias, vermelho quando vence</td></tr>
+      <tr><td>Parto previsto</td><td>30 dias antes</td></tr>
+      <tr><td>Estoque</td><td>Saldo igual ou abaixo do mínimo. Vermelho quando zera</td></tr>
+      <tr><td>Mortalidade das aves</td><td>Mais de 2% do lote em 7 dias</td></tr>
+      <tr><td>Tarefas e contas</td><td>No dia do vencimento ou depois</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2 data-sec="s15"><span class="num">15</span>Rotina sugerida e dúvidas frequentes</h2>
+  <h3>Rotina sugerida</h3>
+  <table>
+    <thead><tr><th style="width:34mm">Quando</th><th>O que lançar</th><th>Onde</th></tr></thead>
+    <tbody>
+      <tr><td>Todo dia</td><td>Ovos, descarte, mortes e ração de cada lote</td><td>Aves › Produção diária</td></tr>
+      <tr><td>Todo dia</td><td>Litros da ordenha</td><td>Bovinos › Leite</td></tr>
+      <tr><td>Todo dia</td><td>Olhar alertas e tarefas</td><td>Painel</td></tr>
+      <tr><td>A cada manejo</td><td>Vacina, vermífugo ou remédio, com próxima dose e carência</td><td>Sanidade</td></tr>
+      <tr><td>A cada compra ou uso</td><td>Entrada ou saída de insumo</td><td>Estoque</td></tr>
+      <tr><td>Semanal</td><td>Peso médio de uma amostra dos frangos de corte</td><td>Ficha do lote › Registro diário</td></tr>
+      <tr><td>Mensal ou trimestral</td><td>Pesagem do gado no tronco</td><td>Bovinos › Pesagens › Pesagem em lote</td></tr>
+      <tr><td>Na estação de monta</td><td>Coberturas, inseminações e diagnósticos</td><td>Bovinos › Reprodução</td></tr>
+      <tr><td>Mensal</td><td>Conferir contas pendentes, lançar a folha e baixar um backup</td><td>Financeiro, Equipe, Configurações</td></tr>
+    </tbody>
+  </table>
+  <h3>Dúvidas frequentes</h3>
+  <dl class="faq">
+    <dt>Lancei algo sem internet. Perdi?</dt>
+    <dd>Não. Fica guardado no aparelho e sobe sozinho quando o sinal voltar. O indicador mostra quantos registros faltam enviar.</dd>
+    <dt>Duas pessoas editaram o mesmo animal. Qual vale?</dt>
+    <dd>A alteração feita por último. Registros diferentes, como duas pesagens, nunca se perdem.</dd>
+    <dt>Apaguei um animal por engano.</dt>
+    <dd>Não dá para desfazer pelo app. Se houver um backup recente, o administrador pode importá-lo, mas isso volta tudo para a data do backup. Por isso, para venda ou morte, use sempre <strong>Saída</strong>.</dd>
+    <dt>A categoria do animal está errada.</dt>
+    <dd>Confira a data de nascimento, o sexo e a finalidade no cadastro. A categoria é calculada por esses três dados e pelos partos registrados.</dd>
+    <dt>O valor do rebanho está baixo.</dt>
+    <dd>Atualize o preço da arroba em <strong>Configurações</strong> e confira se os animais têm pesagens recentes. Animal sem pesagem conta como zero.</dd>
+    <dt>Troquei de celular.</dt>
+    <dd>Instale de novo pelo Safari e entre com o mesmo e-mail e senha. Tudo é baixado do servidor. Antes de sair do celular antigo, confirme que o indicador mostra <strong>Sincronizado</strong>.</dd>
+    <dt>Esqueci a senha.</dt>
+    <dd>Peça ao administrador para definir uma nova em <strong>Configurações › Usuários › Nova senha</strong>.</dd>
+  </dl>
+</section>
+
+</body>
+</html>

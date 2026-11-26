@@ -69,7 +69,7 @@ export default function Painel() {
     <div className="stack">
       <PageHeader titulo={s.config.nomeEstancia} subtitulo={`Resumo da estância em ${formatarData(H)}`} />
 
-      <div className="grid stats">
+      <div className="grid stats tres">
         <Stat rotulo="Bovinos ativos" valor={ativos.length} sub={`${formatarNumero(ua)} UA · ${prenhes} vacas prenhes`} />
         <Stat
           rotulo="Lotação"

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" font-family="Inter, sans-serif" font-size="13" role="img" aria-label="Tudo fica salvo no aparelho e a fila sobe quando há internet">
+  <defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8f978a"/></marker></defs>
+  <text x="24" y="30" font-size="15" font-weight="700" fill="#1F3A22">Tudo fica salvo no aparelho e a fila sobe quando há internet</text>
+  <g fill="none" stroke="#8f978a" stroke-width="1.4">
+    <path d="M174 110H210" marker-end="url(#seta)"/>
+    <path d="M360 110H396" marker-end="url(#seta)"/>
+    <path d="M524 110H560" marker-end="url(#seta)"/>
+    <path d="M460 150V222" marker-end="url(#seta)"/>
+    <path d="M635 138V222" marker-end="url(#seta)"/>
+    <path d="M385 250H285V138" marker-end="url(#seta)"/>
+  </g>
+  <g text-anchor="middle">
+    <rect x="24" y="82" width="150" height="56" rx="8" fill="#fff" stroke="#8f978a" stroke-width="1.25"/>
+    <text x="99" y="107" font-weight="650" fill="#22261F">Lançamento</text><text x="99" y="125" font-size="11.5" fill="#5d6356">em qualquer tela</text>
+    <rect x="210" y="82" width="150" height="56" rx="8" fill="#e3edde" stroke="#2F5D34" stroke-width="2"/>
+    <text x="285" y="107" font-weight="650" fill="#22261F">Salvo no aparelho</text><text x="285" y="125" font-size="11.5" fill="#5d6356">entra na fila de envio</text>
+    <polygon points="396,110 460,70 524,110 460,150" fill="#fff" stroke="#8f978a" stroke-width="1.25"/>
+    <text x="460" y="114" fill="#22261F">Tem internet?</text>
+    <rect x="560" y="82" width="150" height="56" rx="8" fill="#fff" stroke="#8f978a" stroke-width="1.25"/>
+    <text x="635" y="107" font-weight="650" fill="#22261F">Envia ao servidor</text><text x="635" y="125" font-size="11.5" fill="#5d6356">e baixa as novidades</text>
+    <rect x="385" y="222" width="150" height="56" rx="8" fill="#fbf1df" stroke="#E8A33D" stroke-width="1.5"/>
+    <text x="460" y="247" font-weight="650" fill="#22261F">Fica na fila</text><text x="460" y="265" font-size="11.5" fill="#5d6356">aguardando o sinal</text>
+    <rect x="560" y="222" width="150" height="56" rx="8" fill="#fff" stroke="#8f978a" stroke-width="1.25"/>
+    <text x="635" y="247" font-weight="650" fill="#22261F">Outros aparelhos</text><text x="635" y="265" font-size="11.5" fill="#5d6356">recebem os dados</text>
+    <text x="542" y="102" font-size="11.5" fill="#5d6356">sim</text>
+  </g>
+  <text x="468" y="186" font-size="11.5" fill="#5d6356">não</text>
+  <text x="643" y="186" font-size="11.5" fill="#5d6356">ao sincronizar</text>
+  <text x="277" y="254" text-anchor="end" font-size="11.5" fill="#5d6356">tenta de novo quando o sinal volta</text>
+</svg>

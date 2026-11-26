@@ -1,13 +1,14 @@
 :root {
-  --bg: #f6f3ec;
+  /* Marca Fazenda Ativa: Verde Campo, Verde Mata, Verde Broto, Âmbar Sol, Creme Palha, Carvão */
+  --bg: #f6f1e4;
   --surface: #ffffff;
-  --surface-2: #faf8f3;
-  --border: #e4ddcf;
-  --text: #2b2a26;
-  --text-2: #6b665b;
-  --primary: #3f6b3a;
-  --primary-hover: #345a30;
-  --primary-soft: #e6efe3;
+  --surface-2: #fbf8f0;
+  --border: #e5dcc8;
+  --text: #22261f;
+  --text-2: #646a5c;
+  --primary: #2f5d34;
+  --primary-hover: #264d2b;
+  --primary-soft: #e3edde;
   --accent: #a0642c;
   --accent-soft: #f5e9dc;
   --danger: #b3362c;
@@ -16,9 +17,11 @@
   --warning-soft: #fbf0d6;
   --info: #2f6690;
   --info-soft: #e1edf6;
-  --sidebar: #263a24;
-  --sidebar-text: #dfe8da;
-  --sidebar-active: #3f6b3a;
+  --sidebar: #1f3a22;
+  --sidebar-text: #e2eadb;
+  --sidebar-active: #2f5d34;
+  --marca-broto: #9cc56b;
+  --marca-ambar: #e8a33d;
   --radius: 10px;
   --shadow: 0 1px 2px rgba(40, 35, 20, 0.06), 0 2px 8px rgba(40, 35, 20, 0.05);
   --chart-1: #257de0;
@@ -35,8 +38,8 @@
     --border: #353c31;
     --text: #e9e7e0;
     --text-2: #a7a99c;
-    --primary: #79ad6f;
-    --primary-hover: #8cc081;
+    --primary: #9cc56b;
+    --primary-hover: #aed27f;
     --primary-soft: #2a3a27;
     --accent: #d99b5c;
     --accent-soft: #3a2e22;
@@ -63,8 +66,8 @@
   --border: #353c31;
   --text: #e9e7e0;
   --text-2: #a7a99c;
-  --primary: #79ad6f;
-  --primary-hover: #8cc081;
+  --primary: #9cc56b;
+  --primary-hover: #aed27f;
   --primary-soft: #2a3a27;
   --accent: #d99b5c;
   --accent-soft: #3a2e22;
@@ -89,7 +92,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font: 15px/1.5 Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--primary); text-decoration: none; }
@@ -145,6 +148,7 @@ h3 { font-size: 0.95rem; }
 
 .grid { display: grid; gap: 16px; }
 .grid.stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.grid.stats.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid.cols-2-1 { grid-template-columns: 2fr 1fr; }
@@ -265,7 +269,7 @@ input[type='checkbox'] { width: auto; }
 .recharts-cartesian-grid line { stroke: var(--border); }
 
 @media (max-width: 560px) {
-  .grid.stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .grid.stats, .grid.stats.tres { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .grid.stats .card { padding: 12px; }
   .stat .valor { font-size: 1.15rem; }
   h1 { font-size: 1.3rem; }
@@ -275,8 +279,8 @@ input[type='checkbox'] { width: auto; }
 /* --------------------------- Entrada / Sync -------------------------- */
 .entrar { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--sidebar); }
 .entrar-cartao { width: 100%; max-width: 400px; padding: 26px; }
-.entrar-marca { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; color: var(--primary); }
-.entrar-marca strong { display: block; color: var(--text); font-size: 1.05rem; }
+.entrar-marca { display: flex; gap: 14px; align-items: center; margin-bottom: 20px; }
+.entrar-marca .nome-marca { font-size: 1.45rem; }
 .entrar-marca small { color: var(--text-2); }
 .aviso-erro { background: var(--danger-soft); color: var(--danger); padding: 8px 12px; border-radius: 8px; font-size: 0.88rem; }
 .aviso { background: var(--warning-soft); color: var(--text); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem; }
@@ -296,3 +300,12 @@ input[type='checkbox'] { width: auto; }
 .sidebar .brand { padding-top: calc(20px + env(safe-area-inset-top)); }
 .content { padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
 .entrar { padding-top: calc(24px + env(safe-area-inset-top)); }
+
+/* ------------------------------ Marca ------------------------------ */
+.nome-marca { letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; color: var(--text); }
+.nome-marca .fazenda { font-weight: 500; }
+.nome-marca .ativa { font-weight: 800; color: var(--primary); }
+.nome-marca.claro { color: #f6f1e4; }
+.nome-marca.claro .ativa { color: var(--marca-broto); }
+.sidebar .brand .nome-marca { font-size: 1.15rem; display: block; }
+.topbar .marca-topo { display: flex; align-items: center; gap: 8px; min-width: 0; }
