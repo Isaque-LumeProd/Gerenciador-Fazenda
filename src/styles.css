@@ -166,8 +166,8 @@ h3 { font-size: 0.95rem; }
 .btn:hover { background: var(--surface-2); text-decoration: none; }
 .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
 .btn.primary:hover { background: var(--primary-hover); }
-:root[data-theme='dark'] .btn.primary, :root:not([data-theme='light']) .btn.primary { color: #10170e; }
-:root[data-theme='light'] .btn.primary { color: #fff; }
+:root[data-theme='dark'] .btn.primary { color: #10170e; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .btn.primary { color: #10170e; } }
 .btn.danger { color: var(--danger); }
 .btn.danger:hover { background: var(--danger-soft); }
 .btn.small { padding: 4px 9px; font-size: 0.82rem; }
@@ -271,3 +271,28 @@ input[type='checkbox'] { width: auto; }
   h1 { font-size: 1.3rem; }
 }
 .stat .valor { overflow-wrap: anywhere; }
+
+/* --------------------------- Entrada / Sync -------------------------- */
+.entrar { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--sidebar); }
+.entrar-cartao { width: 100%; max-width: 400px; padding: 26px; }
+.entrar-marca { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; color: var(--primary); }
+.entrar-marca strong { display: block; color: var(--text); font-size: 1.05rem; }
+.entrar-marca small { color: var(--text-2); }
+.aviso-erro { background: var(--danger-soft); color: var(--danger); padding: 8px 12px; border-radius: 8px; font-size: 0.88rem; }
+.aviso { background: var(--warning-soft); color: var(--text); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.9rem; }
+
+.status-sync { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); border-radius: 99px; padding: 3px 10px; font: inherit; font-size: 0.78rem; cursor: pointer; white-space: nowrap; }
+.status-sync.claro { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12); color: var(--sidebar-text); }
+.status-sync .ponto { width: 8px; height: 8px; border-radius: 99px; background: var(--primary); flex-shrink: 0; }
+.status-sync.pendente .ponto { background: var(--warning); }
+.status-sync.offline .ponto { background: var(--text-2); }
+.status-sync.erro .ponto { background: var(--danger); }
+.status-sync.claro.ok .ponto { background: #8cc081; }
+.topbar .status-sync { margin-left: auto; }
+
+/* iPhone: respeita o notch e a barra inferior quando aberto pela tela inicial */
+.topbar { padding-top: calc(10px + env(safe-area-inset-top)); }
+.topbar strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar .brand { padding-top: calc(20px + env(safe-area-inset-top)); }
+.content { padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
+.entrar { padding-top: calc(24px + env(safe-area-inset-top)); }

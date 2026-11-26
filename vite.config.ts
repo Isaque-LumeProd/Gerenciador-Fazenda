@@ -1,9 +1,43 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
+import { apiLocal } from './server/vite-api-local';
 
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    react(),
+    // `--mode servidor-local`: serve a API com banco embutido, sem precisar do Netlify.
+    mode === 'servidor-local' && apiLocal(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'Gerenciador da Estância',
+        short_name: 'Estância',
+        description: 'Gestão de gado, aves, sanidade, estoque e financeiro da estância.',
+        lang: 'pt-BR',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        background_color: '#263a24',
+        theme_color: '#263a24',
+        icons: [
+          { src: 'icone-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icone-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icone-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        // O app inteiro fica guardado no aparelho e abre sem internet.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
+        navigateFallback: '/index.html',
+        // A API nunca passa pelo cache: dados sempre vêm do servidor (ou do armazenamento local do app).
+        navigateFallbackDenylist: [/^\/api\//],
+        cleanupOutdatedCaches: true,
+      },
+    }),
+  ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
@@ -20,4 +54,4 @@ export default defineConfig({
   test: {
     environment: 'node',
   },
-});
+}));

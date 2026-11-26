@@ -163,13 +163,6 @@ export const useFazenda = create<EstadoFazenda>()(
       name: 'gerenciador-fazenda:v1',
       version: 1,
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        // Primeira execução: carrega uma estância de demonstração para explorar o app.
-        if (state && typeof localStorage !== 'undefined' && !localStorage.getItem('gerenciador-fazenda:iniciado')) {
-          localStorage.setItem('gerenciador-fazenda:iniciado', '1');
-          if (state.bovinos.length === 0 && state.lotesAves.length === 0) state.carregarDemo();
-        }
-      },
     },
   ),
 );

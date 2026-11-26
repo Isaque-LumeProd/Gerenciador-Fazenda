@@ -17,8 +17,12 @@ import Agenda from './pages/Agenda';
 import Equipe from './pages/Equipe';
 import Configuracoes from './pages/Configuracoes';
 import { Vazio } from './components/ui';
+import Entrar from './pages/Entrar';
+import { useSync } from './sync/motor';
 
 export default function App() {
+  const temSessao = useSync((s) => s.sessao !== null);
+  if (!temSessao) return <Entrar />;
   return (
     <Routes>
       <Route element={<Layout />}>

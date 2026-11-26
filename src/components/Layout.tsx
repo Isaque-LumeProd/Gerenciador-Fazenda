@@ -3,6 +3,9 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Icone, type NomeIcone } from './Icone';
 import { useFazenda } from '@/store/useFazenda';
 import { gerarAlertas } from '@/lib/alertas';
+import { StatusSync } from './StatusSync';
+import { useSync } from '@/sync/motor';
+import Entrar from '@/pages/Entrar';
 
 const menu: { grupo?: string; to: string; rotulo: string; icone: NomeIcone; fim?: boolean }[] = [
   { to: '/', rotulo: 'Painel', icone: 'painel', fim: true },
@@ -34,6 +37,8 @@ function lerTema(): Tema {
 export function Layout() {
   const [aberta, setAberta] = useState(false);
   const [tema, setTema] = useState<Tema>(lerTema);
+  const expirada = useSync((x) => x.sessaoExpirada);
+  const [adiado, setAdiado] = useState(false);
   const local = useLocation();
   const nome = useFazenda((s) => s.config.nomeEstancia);
   const s = useFazenda();
@@ -56,6 +61,11 @@ export function Layout() {
 
   return (
     <div className="app">
+      {expirada && !adiado && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
+          <Entrar reautenticar onAdiar={() => setAdiado(true)} />
+        </div>
+      )}
       {aberta && <div className="overlay" onClick={() => setAberta(false)} />}
       <aside className={`sidebar ${aberta ? 'aberta' : ''}`}>
         <div className="brand">
@@ -77,7 +87,8 @@ export function Layout() {
             </div>
           ))}
         </nav>
-        <div style={{ marginTop: 'auto', padding: '0 18px 18px' }}>
+        <div style={{ marginTop: 'auto', padding: '0 18px 18px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
+          <StatusSync claro />
           <button
             className="btn small ghost"
             style={{ color: 'var(--sidebar-text)' }}
@@ -94,8 +105,15 @@ export function Layout() {
             <Icone nome="menu" tamanho={22} />
           </button>
           <strong>{nome}</strong>
+          <StatusSync />
         </div>
         <main className="content">
+          {expirada && adiado && (
+            <div className="aviso">
+              Sua sessão expirou e as alterações não estão sendo sincronizadas.
+              <button className="btn small" onClick={() => setAdiado(false)}>Entrar novamente</button>
+            </div>
+          )}
           <Outlet />
         </main>
       </div>
