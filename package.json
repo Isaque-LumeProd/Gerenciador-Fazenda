@@ -11,13 +11,14 @@
     "test": "vitest run",
     "typecheck": "tsc -b --noEmit",
     "manual:telas": "node scripts/capturar_telas_manual.cjs",
-    "manual:pdf": "node scripts/gerar_manual_pdf.cjs"
+    "manual:pdf": "node scripts/gerar_manual_pdf.cjs",
+    "teste:seguranca": "node scripts/teste-seguranca-e2e.cjs"
   },
   "dependencies": {
     "@netlify/database": "^2.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.1",
+    "react-router-dom": "^7.18.5",
     "recharts": "^2.15.4",
     "zustand": "^5.0.8"
   },
@@ -29,9 +30,9 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.7.0",
     "typescript": "^5.9.3",
-    "vite": "^5.4.21",
+    "vite": "6.4.5",
     "vite-plugin-pwa": "^1.3.0",
-    "vitest": "^2.1.9"
+    "vitest": "4.1.12"
   },
   "engines": {
     "node": ">=20.12.2"

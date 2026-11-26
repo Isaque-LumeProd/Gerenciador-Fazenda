@@ -43,6 +43,17 @@ export interface RespostaSync {
   mais: boolean;
   /** Alterações enviadas que foram rejeitadas por existir versão mais nova no servidor (já com a versão vencedora). */
   rejeitadas: Mudanca[];
+  /** Alterações recusadas por dados malformados (não foram gravadas). */
+  invalidas?: { colecao: ColecaoSync; id: string; motivo: string }[];
+}
+
+/** Registro apagado que pode ser restaurado pela Lixeira (apenas administradores). */
+export interface ItemLixeira {
+  colecao: ColecaoSync;
+  id: string;
+  dados: Record<string, unknown>;
+  excluidoEm: string;
+  excluidoPor: string | null;
 }
 
 export type Papel = 'admin' | 'membro';

@@ -111,6 +111,7 @@ async function executar() {
     return;
   }
   useSync.setState({ estado: 'sincronizando', erro: null });
+  let recusados = 0;
   try {
     for (let rodada = 0; rodada < 50; rodada++) {
       const { pendentes, cursor } = useSync.getState();
@@ -126,13 +127,20 @@ async function executar() {
 
       const { patch, descartar } = aplicarRemotas(useFazenda.getState(), [...resp.mudancas, ...resp.rejeitadas], fila);
       for (const k of descartar) delete fila[k];
+      // Registros recusados pelo servidor (dados malformados) saem da fila para não travar a sincronização.
+      for (const inv of resp.invalidas ?? []) delete fila[`${inv.colecao}/${inv.id}`];
+      recusados += resp.invalidas?.length ?? 0;
       semRegistrar(() => useFazenda.setState(patch));
       useSync.setState({ pendentes: fila, cursor: resp.cursor });
 
       const restantes = Object.keys(fila).length;
       if (!resp.mais && (restantes === 0 || envio.length < LIMITE_MUDANCAS_POR_ENVIO)) break;
     }
-    useSync.setState({ estado: 'ok', ultimaSync: Date.now() });
+    useSync.setState(
+      recusados
+        ? { estado: 'erro', erro: `${recusados} registro(s) recusado(s) pelo servidor por dados inválidos.`, ultimaSync: Date.now() }
+        : { estado: 'ok', ultimaSync: Date.now() },
+    );
     if (Object.keys(useSync.getState().pendentes).length) agendarSync();
   } catch (e) {
     if (e instanceof ErroApi && e.status === 401) {

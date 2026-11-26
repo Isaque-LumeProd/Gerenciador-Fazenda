@@ -12,3 +12,13 @@ export function gerarId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
+
+/**
+ * Célula de CSV segura: entre aspas e, se começar com = + - @ (fórmula no Excel/Planilhas),
+ * prefixada com apóstrofo para não ser executada ao abrir o arquivo.
+ */
+export function celulaCsv(valor: unknown): string {
+  let t = String(valor ?? '');
+  if (/^[=+\-@\t\r]/.test(t) && !/^-?\d+([.,]\d+)?$/.test(t)) t = "'" + t;
+  return `"${t.replace(/"/g, '""')}"`;
+}

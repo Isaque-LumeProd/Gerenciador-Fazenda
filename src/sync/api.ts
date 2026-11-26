@@ -1,4 +1,4 @@
-import type { FazendaPublica, RequisicaoSync, RespostaSync, UsuarioPublico, Papel } from '../../shared/colecoes';
+import type { FazendaPublica, ItemLixeira, RequisicaoSync, RespostaSync, UsuarioPublico, Papel } from '../../shared/colecoes';
 
 export interface Sessao {
   usuario: UsuarioPublico;
@@ -39,8 +39,9 @@ async function chamar<T>(metodo: string, caminho: string, corpo?: unknown): Prom
 }
 
 export const api = {
-  estado: () => chamar<{ inicializado: boolean }>('GET', '/estado'),
-  cadastro: (d: { nomeEstancia: string; nome: string; email: string; senha: string }) => chamar<Sessao>('POST', '/cadastro', d),
+  estado: () => chamar<{ inicializado: boolean; exigeCodigo?: boolean }>('GET', '/estado'),
+  cadastro: (d: { nomeEstancia: string; nome: string; email: string; senha: string; codigo?: string }) =>
+    chamar<Sessao>('POST', '/cadastro', d),
   login: (email: string, senha: string) => chamar<Sessao>('POST', '/login', { email, senha }),
   logout: () => chamar<{ ok: true }>('POST', '/logout', {}),
   eu: () => chamar<Sessao>('GET', '/eu'),
@@ -49,4 +50,6 @@ export const api = {
   usuarios: () => chamar<UsuarioPublico[]>('GET', '/usuarios'),
   criarUsuario: (d: { nome: string; email: string; senha: string; papel: Papel }) => chamar<UsuarioPublico>('POST', '/usuarios', d),
   alterarUsuario: (id: string, d: { ativo?: boolean; papel?: Papel; senha?: string }) => chamar<UsuarioPublico>('PATCH', `/usuarios/${id}`, d),
+  lixeira: () => chamar<ItemLixeira[]>('GET', '/lixeira'),
+  restaurar: (itens: { colecao: string; id: string }[]) => chamar<{ restaurados: number }>('POST', '/lixeira/restaurar', { itens }),
 };

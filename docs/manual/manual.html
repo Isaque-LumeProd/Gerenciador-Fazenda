@@ -41,8 +41,8 @@
   .caixa b:first-child { display: block; margin-bottom: 0.5mm; color: var(--mata); }
   .formula { font-family: 'Inter Display', Inter; font-size: 10.5pt; background: var(--fundo-tab); border: 1px solid var(--linha); border-radius: 2mm; padding: 2.5mm 4mm; margin: 2mm 0; break-inside: avoid; }
   .formula span { color: var(--campo); font-weight: 700; }
-  .faq dt { font-weight: 650; color: var(--mata); margin-top: 2mm; break-after: avoid; }
-  .faq dd { margin: 0.5mm 0 0; }
+  .faq dt { font-weight: 650; color: var(--mata); margin-top: 1.6mm; break-after: avoid; }
+  .faq dd { margin: 0.3mm 0 0; font-size: 9.5pt; }
   .chip { display: inline-block; padding: 0 2mm; border-radius: 3mm; font-size: 8.5pt; font-weight: 600; }
   .chip.verde { background: #e3edde; color: var(--campo); }
   .chip.amarelo { background: #fbefd6; color: #94620a; }
@@ -124,11 +124,11 @@
 
 <section>
   <h2 data-sec="s2"><span class="num">2</span>Primeiros passos</h2>
-  <p class="lead">No primeiro acesso, crie a estância logo após publicar o site: a primeira pessoa que abrir o endereço vira a administradora.</p>
+  <p class="lead">No primeiro acesso, a pessoa responsável cria a estância usando o código de cadastro e vira a administradora.</p>
   <h3>Criar a estância (uma única vez)</h3>
   <ol>
     <li>Abra o endereço do site no navegador.</li>
-    <li>Preencha nome da estância, seu nome, e-mail e uma senha de pelo menos 8 caracteres.</li>
+    <li>Preencha nome da estância, seu nome, o <strong>código de cadastro</strong> (fornecido por quem publicou o site), e-mail e uma senha de pelo menos 8 caracteres.</li>
     <li>Toque em <strong>Criar estância</strong>. Você entra como <strong>administrador</strong>.</li>
     <li>A estância começa vazia. Para explorar o app antes de lançar dados reais, use <strong>Configurações › Carregar demonstração</strong> e depois <strong>Começar do zero</strong>.</li>
   </ol>
@@ -151,13 +151,13 @@
   <table>
     <thead><tr><th style="width:32mm">Papel</th><th>Pode fazer</th></tr></thead>
     <tbody>
-      <tr><td>Administrador</td><td>Tudo, inclusive criar e desativar usuários, importar backup, carregar demonstração e apagar todos os dados</td></tr>
+      <tr><td>Administrador</td><td>Tudo, inclusive criar e desativar usuários, importar backup, restaurar registros pela Lixeira, carregar demonstração e apagar todos os dados</td></tr>
       <tr><td>Membro</td><td>Registrar e consultar tudo: animais, pesagens, aves, sanidade, estoque, financeiro, agenda</td></tr>
     </tbody>
   </table>
   <h3>Entrar e sair</h3>
   <ul>
-    <li><strong>Entrar:</strong> e-mail e senha. O login vale por 90 dias no aparelho.</li>
+    <li><strong>Entrar:</strong> e-mail e senha. O login vale por 90 dias no aparelho. Depois de 5 senhas erradas, o acesso daquele e-mail fica bloqueado por 15 minutos.</li>
     <li><strong>Sair:</strong> em <strong>Configurações › Conta e sincronização › Sair</strong>. Os dados são apagados do aparelho, mas continuam no servidor. Se houver alterações ainda não enviadas, o app avisa antes.</li>
     <li><strong>Sessão expirada:</strong> o app pede a senha de novo e guarda tudo o que estava pendente. Se estiver sem tempo, toque em <strong>Continuar sem sincronizar por enquanto</strong> e entre depois.</li>
   </ul>
@@ -472,10 +472,11 @@
       <tr><td>Importar backup</td><td>Substitui todos os dados da estância pelos do arquivo, para todos os usuários</td><td>Administrador</td></tr>
       <tr><td>Dados de demonstração</td><td><strong>Carregar demonstração</strong> troca tudo por uma estância fictícia. <strong>Começar do zero</strong> apaga tudo. Valem para todos os usuários</td><td>Administrador</td></tr>
       <tr><td>Usuários</td><td>Criar usuário, trocar o papel, definir nova senha, desativar ou reativar</td><td>Administrador</td></tr>
+      <tr><td>Lixeira</td><td>Registros apagados nos últimos 90 dias, com data e quem apagou. <strong>Restaurar</strong> devolve o registro a todos os aparelhos</td><td>Administrador</td></tr>
       <tr><td>Referências de cálculo</td><td>Resumo das fórmulas usadas pelo app</td><td>Todos</td></tr>
     </tbody>
   </table>
-  <p>Desativar um usuário corta o acesso na hora, em todos os aparelhos dele. Os registros que ele fez continuam na estância.</p>
+  <p>Desativar um usuário corta o acesso na hora, em todos os aparelhos dele. Os registros que ele fez continuam na estância. O arquivo de backup só é importado se estiver íntegro: arquivos alterados ou corrompidos são recusados.</p>
   <div class="caixa"><b>Backup</b>Mesmo com tudo salvo no servidor, baixe um backup de vez em quando (por exemplo, uma vez por mês) e guarde o arquivo fora do celular.</div>
   <figure><img src="imagens/configuracoes.jpg" alt="" style="max-height:92mm;object-fit:cover;object-position:top"><figcaption><b>Figura 17.</b> Configurações vistas pelo administrador.</figcaption></figure>
 </section>
@@ -548,13 +549,15 @@
     <dt>Duas pessoas editaram o mesmo animal. Qual vale?</dt>
     <dd>A alteração feita por último. Registros diferentes, como duas pesagens, nunca se perdem.</dd>
     <dt>Apaguei um animal por engano.</dt>
-    <dd>Não dá para desfazer pelo app. Se houver um backup recente, o administrador pode importá-lo, mas isso volta tudo para a data do backup. Por isso, para venda ou morte, use sempre <strong>Saída</strong>.</dd>
+    <dd>O administrador recupera em <strong>Configurações › Lixeira</strong>, que guarda os registros apagados nos últimos 90 dias (com as pesagens e eventos que saíram junto). Para venda ou morte, use sempre <strong>Saída</strong>, não a exclusão.</dd>
     <dt>A categoria do animal está errada.</dt>
     <dd>Confira a data de nascimento, o sexo e a finalidade no cadastro. A categoria é calculada por esses três dados e pelos partos registrados.</dd>
     <dt>O valor do rebanho está baixo.</dt>
     <dd>Atualize o preço da arroba em <strong>Configurações</strong> e confira se os animais têm pesagens recentes. Animal sem pesagem conta como zero.</dd>
     <dt>Troquei de celular.</dt>
     <dd>Instale de novo pelo Safari e entre com o mesmo e-mail e senha. Tudo é baixado do servidor. Antes de sair do celular antigo, confirme que o indicador mostra <strong>Sincronizado</strong>.</dd>
+    <dt>Apareceu "Muitas tentativas sem sucesso".</dt>
+    <dd>Proteção contra quem tenta adivinhar senhas: aguarde 15 minutos e tente de novo. Se esqueceu a senha, peça uma nova ao administrador.</dd>
     <dt>Esqueci a senha.</dt>
     <dd>Peça ao administrador para definir uma nova em <strong>Configurações › Usuários › Nova senha</strong>.</dd>
   </dl>

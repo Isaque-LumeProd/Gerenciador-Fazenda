@@ -30,6 +30,8 @@ export function apiLocal(diretorioDados = join(process.cwd(), '.dados-locais')):
       const host = req.headers.host ?? 'localhost';
       const headers = new Headers();
       for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') headers.set(k, v);
+      // Imita a borda do Netlify: o IP vem da conexão, nunca de um cabeçalho enviado pelo cliente.
+      headers.set('x-nf-client-connection-ip', req.socket.remoteAddress ?? 'local');
       const resposta = await tratarRequisicao(
         new Request(`http://${host}${req.url}`, {
           method: req.method,
@@ -37,6 +39,8 @@ export function apiLocal(diretorioDados = join(process.cwd(), '.dados-locais')):
           body: req.method === 'GET' || req.method === 'HEAD' ? undefined : new Uint8Array(corpo),
         }),
         await obterBanco(),
+        // Localmente o código de cadastro é opcional: só é exigido se CODIGO_CADASTRO estiver definido.
+        process.env.CODIGO_CADASTRO ? { codigoCadastro: process.env.CODIGO_CADASTRO } : {},
       );
       res.statusCode = resposta.status;
       resposta.headers.forEach((v, k) => res.setHeader(k, v));

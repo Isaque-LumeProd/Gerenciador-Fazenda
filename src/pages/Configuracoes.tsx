@@ -3,9 +3,10 @@ import { exportarDados, useFazenda } from '@/store/useFazenda';
 import { Campo, Card, PageHeader } from '@/components/ui';
 import { Icone } from '@/components/Icone';
 import { hoje } from '@/lib/datas';
-import type { Configuracao, DadosFazenda } from '@/types';
+import type { Configuracao } from '@/types';
+import { validarBackup } from '@/lib/backup';
 import { useSync } from '@/sync/motor';
-import { CardConta, CardUsuarios } from './ContaUsuarios';
+import { CardConta, CardLixeira, CardUsuarios } from './ContaUsuarios';
 
 export default function Configuracoes() {
   const s = useFazenda();
@@ -35,10 +36,14 @@ export default function Configuracoes() {
   const importar = async (file?: File) => {
     if (!file) return;
     try {
-      const dados = JSON.parse(await file.text()) as DadosFazenda;
-      if (!dados || typeof dados !== 'object' || !Array.isArray(dados.bovinos)) throw new Error('formato inválido');
+      if (file.size > 20 * 1024 * 1024) throw new Error('arquivo grande demais (máximo 20 MB)');
+      const v = validarBackup(JSON.parse(await file.text()));
+      if (!v.ok) {
+        const lista = v.erros.slice(0, 6).map((e) => `• ${e}`).join('\n');
+        throw new Error(`o arquivo tem dados inválidos e não foi importado.\n${lista}${v.erros.length > 6 ? `\n… e mais ${v.erros.length - 6}` : ''}`);
+      }
       if (!confirm('Importar este backup substituirá TODOS os dados da estância, para todos os usuários. Continuar?')) return;
-      s.importar(dados);
+      s.importar(v.dados);
       setCfg(useFazenda.getState().config);
       setMsg('Backup importado com sucesso.');
     } catch (err) {
@@ -98,6 +103,7 @@ export default function Configuracoes() {
         </div>
       </div>
       {admin && <CardUsuarios />}
+      {admin && <CardLixeira />}
     </div>
   );
 }

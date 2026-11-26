@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { apiLocal } from './server/vite-api-local';
+import { CABECALHOS_SEGURANCA } from './shared/cabecalhos';
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -38,6 +39,8 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ],
+  // A versão de produção local usa os mesmos cabeçalhos de segurança do Netlify (para testar a CSP).
+  preview: { headers: CABECALHOS_SEGURANCA },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

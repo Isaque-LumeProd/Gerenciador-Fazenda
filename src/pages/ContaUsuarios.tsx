@@ -4,7 +4,7 @@ import { sair, sincronizar, useSync } from '@/sync/motor';
 import { Badge, Campo, Card, ModalForm, Vazio } from '@/components/ui';
 import { StatusSync } from '@/components/StatusSync';
 import { Icone } from '@/components/Icone';
-import type { Papel, UsuarioPublico } from '../../shared/colecoes';
+import type { ItemLixeira, Papel, UsuarioPublico } from '../../shared/colecoes';
 
 const msgErro = (e: unknown) => (e instanceof ErroApi && e.offline ? 'Sem conexão. Tente quando estiver online.' : (e as Error).message);
 
@@ -145,6 +145,86 @@ export function CardUsuarios() {
           </select>
         </Campo>
       </ModalForm>
+    </Card>
+  );
+}
+
+const NOMES_COLECAO: Record<string, string> = {
+  bovinos: 'Animal', pesagens: 'Pesagem', reproducao: 'Evento reprodutivo', leite: 'Ordenha', lotesAves: 'Lote de aves',
+  registrosAves: 'Registro de aves', sanidade: 'Manejo sanitário', pastos: 'Pasto', estoque: 'Item de estoque',
+  movimentosEstoque: 'Movimento de estoque', lancamentos: 'Lançamento', tarefas: 'Tarefa', funcionarios: 'Funcionário',
+};
+
+/** Texto curto que identifica o registro apagado. */
+function descrever(item: ItemLixeira): string {
+  const d = item.dados as Record<string, unknown>;
+  const partes = [d.brinco && `brinco ${d.brinco}`, d.nome, d.codigo, d.titulo, d.descricao, d.produto, d.data]
+    .filter((x) => typeof x === 'string' && x)
+    .slice(0, 2);
+  if (typeof d.pesoKg === 'number') partes.push(`${d.pesoKg} kg`);
+  if (typeof d.valor === 'number') partes.push(`R$ ${d.valor.toLocaleString('pt-BR')}`);
+  return partes.join(' · ') || item.id;
+}
+
+/** Registros apagados nos últimos 90 dias, com opção de restaurar (apenas administradores). */
+export function CardLixeira() {
+  const [itens, setItens] = useState<ItemLixeira[] | null>(null);
+  const [erro, setErro] = useState('');
+  const [ocupado, setOcupado] = useState(false);
+
+  const carregar = useCallback(() => {
+    api.lixeira().then((l) => { setItens(l); setErro(''); }).catch((e) => setErro(msgErro(e)));
+  }, []);
+  useEffect(carregar, [carregar]);
+
+  const restaurar = async (lista: ItemLixeira[]) => {
+    if (!lista.length) return;
+    if (lista.length > 1 && !confirm(`Restaurar ${lista.length} registro(s) apagado(s)?`)) return;
+    setOcupado(true);
+    try {
+      const r = await api.restaurar(lista.map((i) => ({ colecao: i.colecao, id: i.id })));
+      await sincronizar();
+      alert(`${r.restaurados} registro(s) restaurado(s).`);
+      carregar();
+    } catch (e) {
+      alert(msgErro(e));
+    } finally {
+      setOcupado(false);
+    }
+  };
+
+  return (
+    <Card
+      titulo="Lixeira"
+      subtitulo="Registros apagados nos últimos 90 dias. Restaure algo excluído por engano ou de má-fé."
+      flush
+      acoes={
+        <>
+          <button className="btn small" onClick={carregar} disabled={ocupado}>Atualizar</button>
+          {!!itens?.length && <button className="btn small" onClick={() => void restaurar(itens)} disabled={ocupado}>Restaurar todos</button>}
+        </>
+      }
+    >
+      {erro ? <Vazio titulo="Não foi possível carregar">{erro}</Vazio> : !itens ? <Vazio titulo="Carregando…" /> : itens.length === 0 ? (
+        <Vazio titulo="Lixeira vazia">Nenhum registro apagado nos últimos 90 dias.</Vazio>
+      ) : (
+        <div className="table-wrap" style={{ marginTop: 10, maxHeight: 420, overflowY: 'auto' }}>
+          <table className="tabela">
+            <thead><tr><th>Apagado em</th><th>Tipo</th><th>Registro</th><th>Por</th><th /></tr></thead>
+            <tbody>
+              {itens.map((i) => (
+                <tr key={`${i.colecao}/${i.id}`}>
+                  <td>{new Date(i.excluidoEm).toLocaleString('pt-BR')}</td>
+                  <td>{NOMES_COLECAO[i.colecao] ?? i.colecao}</td>
+                  <td>{descrever(i)}</td>
+                  <td>{i.excluidoPor ?? '—'}</td>
+                  <td className="acoes"><button className="btn small ghost" disabled={ocupado} onClick={() => void restaurar([i])}>Restaurar</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </Card>
   );
 }

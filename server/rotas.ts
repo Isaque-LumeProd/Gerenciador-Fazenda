@@ -1,12 +1,15 @@
-// API do Gerenciador da Estância. Um único ponto de entrada (`/api/*`) usado pela
+// API da Fazenda Ativa. Um único ponto de entrada (`/api/*`) usado pela
 // Netlify Function e pelo servidor de desenvolvimento local.
 import type { Banco, Cliente } from './banco';
-import { gerarHashSenha, gerarToken, hashToken, verificarSenha } from './seguranca';
+import { compararSegredo, gerarHashSenha, gerarToken, hashToken, verificarSenha } from './seguranca';
+import { validarRegistro } from '../shared/esquema';
 import {
   COLECOES_SYNC,
   LIMITE_MUDANCAS_POR_BUSCA,
   LIMITE_MUDANCAS_POR_ENVIO,
+  type ColecaoSync,
   type FazendaPublica,
+  type ItemLixeira,
   type Mudanca,
   type Papel,
   type RequisicaoSync,
@@ -18,6 +21,19 @@ const COOKIE = 'sessao_estancia';
 const DURACAO_SESSAO_DIAS = 90;
 const TAMANHO_MAX_REGISTRO = 64 * 1024;
 const COLECOES = new Set<string>(COLECOES_SYNC);
+
+/** Limites de tentativas que falharam dentro da janela, antes de bloquear temporariamente. */
+const JANELA_TENTATIVAS_MIN = 15;
+const LIMITE_POR_EMAIL = 5;
+const LIMITE_POR_IP = 30;
+
+export interface OpcoesApi {
+  /**
+   * Código exigido para criar a estância (variável CODIGO_CADASTRO no Netlify).
+   * `null` = cadastro bloqueado até o código ser configurado. `undefined` = sem código (só desenvolvimento local).
+   */
+  codigoCadastro?: string | null;
+}
 
 class ErroHttp extends Error {
   constructor(public status: number, mensagem: string) {
@@ -33,7 +49,13 @@ interface Sessao {
 const json = (dados: unknown, status = 200, headers: Record<string, string> = {}) =>
   new Response(JSON.stringify(dados), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers },
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff',
+      'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+      ...headers,
+    },
   });
 
 function cookieSessao(req: Request, token: string, maxAgeSeg: number): string {
@@ -52,7 +74,9 @@ function lerCookie(req: Request, nome: string): string | undefined {
 
 async function lerJson<T>(req: Request): Promise<T> {
   // Exigir JSON impede envios de formulários de outros sites (proteção contra CSRF junto com SameSite).
-  if (!req.headers.get('content-type')?.includes('application/json')) throw new ErroHttp(415, 'Envie JSON.');
+  // Compara só o tipo (antes do ';'): "text/plain; x=application/json" é um envio "simples" que outro site consegue fazer.
+  const tipo = (req.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
+  if (tipo !== 'application/json') throw new ErroHttp(415, 'Envie JSON.');
   try {
     return (await req.json()) as T;
   } catch {
@@ -75,6 +99,30 @@ const senha = (v: unknown) => {
   if (v.length > 200) throw new ErroHttp(400, 'Senha muito longa.');
   return v;
 };
+
+/* ------------------------ Limite de tentativas ----------------------- */
+
+/** IP do visitante informado pela borda do Netlify (não confiamos em X-Forwarded-For, que o cliente pode forjar). */
+function ipCliente(req: Request): string {
+  return req.headers.get('x-nf-client-connection-ip') ?? 'desconhecido';
+}
+
+async function verificarBloqueio(db: Banco, chaves: { chave: string; limite: number }[]) {
+  for (const { chave, limite } of chaves) {
+    const { rows } = await db.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM tentativas_acesso WHERE chave = $1 AND momento > now() - ($2 || ' minutes')::interval`,
+      [chave, String(JANELA_TENTATIVAS_MIN)],
+    );
+    if (rows[0].n >= limite) {
+      throw new ErroHttp(429, `Muitas tentativas sem sucesso. Aguarde ${JANELA_TENTATIVAS_MIN} minutos e tente de novo.`);
+    }
+  }
+}
+
+async function registrarFalha(db: Banco, chaves: string[]) {
+  for (const chave of chaves) await db.query('INSERT INTO tentativas_acesso (chave) VALUES ($1)', [chave]);
+  await db.query(`DELETE FROM tentativas_acesso WHERE momento < now() - interval '1 day'`);
+}
 
 /* ----------------------------- Sessões ------------------------------ */
 
@@ -114,14 +162,26 @@ async function exigirSessao(req: Request, db: Banco): Promise<Sessao> {
 
 /* ------------------------------ Rotas ------------------------------- */
 
-async function estado(db: Banco) {
+async function estado(db: Banco, opcoes: OpcoesApi) {
   const { rows } = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM fazendas');
-  return json({ inicializado: rows[0].n > 0 });
+  return json({ inicializado: rows[0].n > 0, exigeCodigo: opcoes.codigoCadastro !== undefined });
 }
 
 /** Cria a estância e o primeiro usuário (administrador). Só é permitido enquanto o banco está vazio. */
-async function cadastro(req: Request, db: Banco) {
+async function cadastro(req: Request, db: Banco, opcoes: OpcoesApi) {
   const corpo = await lerJson<Record<string, unknown>>(req);
+  // Sem o código, qualquer pessoa que achasse o site antes do dono poderia criar a estância e virar administradora.
+  if (opcoes.codigoCadastro !== undefined) {
+    const chaveIp = `cadastro-ip:${ipCliente(req)}`;
+    await verificarBloqueio(db, [{ chave: chaveIp, limite: LIMITE_POR_EMAIL }]);
+    if (!opcoes.codigoCadastro) {
+      throw new ErroHttp(403, 'Cadastro desativado: configure a variável CODIGO_CADASTRO no Netlify e publique de novo.');
+    }
+    if (typeof corpo.codigo !== 'string' || !compararSegredo(corpo.codigo.trim(), opcoes.codigoCadastro)) {
+      await registrarFalha(db, [chaveIp]);
+      throw new ErroHttp(403, 'Código de cadastro incorreto.');
+    }
+  }
   const nomeEstancia = texto(corpo.nomeEstancia, 'nome da estância');
   const nome = texto(corpo.nome, 'nome');
   const mail = email(corpo.email);
@@ -154,6 +214,11 @@ async function login(req: Request, db: Banco) {
   const corpo = await lerJson<Record<string, unknown>>(req);
   const mail = email(corpo.email);
   const s = typeof corpo.senha === 'string' ? corpo.senha : '';
+  const chaves = [`login-email:${mail}`, `login-ip:${ipCliente(req)}`];
+  await verificarBloqueio(db, [
+    { chave: chaves[0], limite: LIMITE_POR_EMAIL },
+    { chave: chaves[1], limite: LIMITE_POR_IP },
+  ]);
   const { rows } = await db.query<{ id: string; senha_hash: string; ativo: boolean }>(
     'SELECT id, senha_hash, ativo FROM usuarios WHERE email = $1',
     [mail],
@@ -161,7 +226,11 @@ async function login(req: Request, db: Banco) {
   const u = rows[0];
   // Calcula o hash mesmo sem usuário para não revelar quais e-mails existem pelo tempo de resposta.
   const ok = await verificarSenha(s, u?.senha_hash ?? (await (hashFalso ??= gerarHashSenha(gerarToken()))));
-  if (!u || !ok || !u.ativo) throw new ErroHttp(401, 'E-mail ou senha incorretos.');
+  if (!u || !ok || !u.ativo) {
+    await registrarFalha(db, chaves);
+    throw new ErroHttp(401, 'E-mail ou senha incorretos.');
+  }
+  await db.query('DELETE FROM tentativas_acesso WHERE chave = $1', [chaves[0]]);
   const token = await criarSessao(db, u.id);
   await db.query('DELETE FROM sessoes WHERE usuario_id = $1 AND expira_em < now()', [u.id]);
   const sessao = await sessaoAtual(new Request(req.url, { headers: { cookie: `${COOKIE}=${token}` } }), db);
@@ -177,8 +246,13 @@ async function logout(req: Request, db: Banco) {
 async function trocarSenha(req: Request, db: Banco, s: Sessao) {
   const corpo = await lerJson<Record<string, unknown>>(req);
   const nova = senha(corpo.novaSenha);
+  const chave = `senha-usuario:${s.usuario.id}`;
+  await verificarBloqueio(db, [{ chave, limite: LIMITE_POR_EMAIL }]);
   const { rows } = await db.query<{ senha_hash: string }>('SELECT senha_hash FROM usuarios WHERE id = $1', [s.usuario.id]);
-  if (!(await verificarSenha(String(corpo.senhaAtual ?? ''), rows[0].senha_hash))) throw new ErroHttp(400, 'Senha atual incorreta.');
+  if (!(await verificarSenha(String(corpo.senhaAtual ?? ''), rows[0].senha_hash))) {
+    await registrarFalha(db, [chave]);
+    throw new ErroHttp(400, 'Senha atual incorreta.');
+  }
   await db.query('UPDATE usuarios SET senha_hash = $1 WHERE id = $2', [await gerarHashSenha(nova), s.usuario.id]);
   // Encerra as outras sessões do usuário.
   const atual = hashToken(lerCookie(req, COOKIE) ?? '');
@@ -276,8 +350,23 @@ async function sincronizar(req: Request, db: Banco, s: Sessao) {
   const cursor = Number.isFinite(corpo.cursor) && corpo.cursor > 0 ? Math.trunc(corpo.cursor) : 0;
   const recebidas = Array.isArray(corpo.mudancas) ? corpo.mudancas : [];
   if (recebidas.length > LIMITE_MUDANCAS_POR_ENVIO) throw new ErroHttp(413, 'Mudanças demais em um único envio.');
-  const mudancas = recebidas.map(validarMudanca);
   const agora = Date.now();
+  // Cada registro precisa seguir o esquema da sua coleção: dados malformados poderiam travar o app dos outros usuários.
+  const invalidas: NonNullable<RespostaSync['invalidas']> = [];
+  const mudancas: Mudanca[] = [];
+  for (const m of recebidas.map(validarMudanca)) {
+    if (m.colecao === 'config' && (m.id !== 'config' || m.dados === null)) {
+      invalidas.push({ colecao: m.colecao, id: m.id, motivo: 'configuração inválida' });
+      continue;
+    }
+    if (m.dados === null) {
+      mudancas.push(m);
+      continue;
+    }
+    const v = validarRegistro(m.colecao, m.id, m.dados);
+    if (v.ok) mudancas.push({ ...m, dados: v.registro });
+    else invalidas.push({ colecao: m.colecao, id: m.id, motivo: v.erros.slice(0, 3).join('; ') });
+  }
   // Se o mesmo registro vier mais de uma vez, fica só a versão mais recente.
   const unicas = new Map<string, Mudanca>();
   for (const m of mudancas) {
@@ -337,19 +426,105 @@ async function sincronizar(req: Request, db: Banco, s: Sessao) {
     mudancas: pagina.map(paraMudanca),
     mais,
     rejeitadas,
+    invalidas,
   };
   return json(resposta);
 }
 
+/* ------------------------------ Lixeira ----------------------------- */
+
+const DIAS_LIXEIRA = 90;
+
+/** Registros apagados nos últimos 90 dias, com a última versão antes da exclusão. */
+async function listarLixeira(db: Banco, s: Sessao) {
+  exigirAdmin(s);
+  const { rows } = await db.query<{
+    colecao: ColecaoSync;
+    id: string;
+    dados: Record<string, unknown> | null;
+    excluido_em: string;
+    excluido_por: string | null;
+  }>(
+    `SELECT r.colecao, r.id, r.recebido_em AS excluido_em, u.nome AS excluido_por,
+            (SELECT h.dados FROM registros_historico h
+              WHERE h.fazenda_id = r.fazenda_id AND h.colecao = r.colecao AND h.registro_id = r.id AND h.dados IS NOT NULL
+              ORDER BY h.id DESC LIMIT 1) AS dados
+       FROM registros r LEFT JOIN usuarios u ON u.id = r.atualizado_por
+      WHERE r.fazenda_id = $1 AND r.excluido AND r.recebido_em > now() - ($2 || ' days')::interval
+      ORDER BY r.recebido_em DESC LIMIT 1000`,
+    [s.fazenda.id, String(DIAS_LIXEIRA)],
+  );
+  const itens: ItemLixeira[] = rows
+    .filter((r) => r.dados)
+    .map((r) => ({
+      colecao: r.colecao,
+      id: r.id,
+      dados: r.dados!,
+      excluidoEm: new Date(r.excluido_em).toISOString(),
+      excluidoPor: r.excluido_por,
+    }));
+  return json(itens);
+}
+
+/** Restaura registros apagados como uma nova versão: todos os aparelhos recebem na próxima sincronização. */
+async function restaurarLixeira(req: Request, db: Banco, s: Sessao) {
+  exigirAdmin(s);
+  const corpo = await lerJson<{ itens?: unknown }>(req);
+  const itens = Array.isArray(corpo.itens) ? corpo.itens : [];
+  if (!itens.length || itens.length > 1000) throw new ErroHttp(400, 'Informe de 1 a 1000 itens.');
+  const alvos = itens.map((it) => {
+    const x = it as { colecao?: unknown; id?: unknown };
+    if (typeof x.colecao !== 'string' || !COLECOES.has(x.colecao) || typeof x.id !== 'string' || x.id.length > 100) {
+      throw new ErroHttp(400, 'Item inválido.');
+    }
+    return { colecao: x.colecao, id: x.id };
+  });
+  const restaurados = await db.transacao(async (c) => {
+    await c.query('SELECT pg_advisory_xact_lock(hashtext($1))', [s.fazenda.id]);
+    const { rows } = await c.query<{ id: string }>(
+      `UPDATE registros r
+          SET dados = v.dados, excluido = false, modificado_em = $2, atualizado_por = $3,
+              seq = nextval('registros_seq'), recebido_em = now()
+         FROM (
+           SELECT DISTINCT ON (h.colecao, h.registro_id) h.colecao, h.registro_id, h.dados
+             FROM registros_historico h
+             JOIN unnest($4::text[], $5::text[]) AS t(colecao, id) ON h.colecao = t.colecao AND h.registro_id = t.id
+            WHERE h.fazenda_id = $1 AND h.dados IS NOT NULL
+            ORDER BY h.colecao, h.registro_id, h.id DESC
+         ) v
+        WHERE r.fazenda_id = $1 AND r.colecao = v.colecao AND r.id = v.registro_id AND r.excluido
+        RETURNING r.id`,
+      [s.fazenda.id, Date.now(), s.usuario.id, alvos.map((a) => a.colecao), alvos.map((a) => a.id)],
+    );
+    return rows.length;
+  });
+  return json({ restaurados });
+}
+
 /* ------------------------------ Roteador ---------------------------- */
 
-export async function tratarRequisicao(req: Request, db: Banco): Promise<Response> {
+/** Recusa requisições que alteram dados vindas de outro site (defesa adicional contra CSRF). */
+function verificarOrigem(req: Request, url: URL) {
+  if (req.method === 'GET' || req.method === 'HEAD') return;
+  const origem = req.headers.get('origin');
+  if (!origem) return; // navegadores sempre enviam Origin em POST/PATCH vindos de outro site
+  let host: string;
+  try {
+    host = new URL(origem).host;
+  } catch {
+    throw new ErroHttp(403, 'Origem inválida.');
+  }
+  if (host !== url.host) throw new ErroHttp(403, 'Origem não permitida.');
+}
+
+export async function tratarRequisicao(req: Request, db: Banco, opcoes: OpcoesApi = {}): Promise<Response> {
   const url = new URL(req.url);
   const caminho = url.pathname.replace(/^\/api/, '').replace(/\/+$/, '') || '/';
   const m = req.method;
   try {
-    if (caminho === '/estado' && m === 'GET') return await estado(db);
-    if (caminho === '/cadastro' && m === 'POST') return await cadastro(req, db);
+    verificarOrigem(req, url);
+    if (caminho === '/estado' && m === 'GET') return await estado(db, opcoes);
+    if (caminho === '/cadastro' && m === 'POST') return await cadastro(req, db, opcoes);
     if (caminho === '/login' && m === 'POST') return await login(req, db);
     if (caminho === '/logout' && m === 'POST') return await logout(req, db);
 
@@ -359,6 +534,8 @@ export async function tratarRequisicao(req: Request, db: Banco): Promise<Respons
     if (caminho === '/sync' && m === 'POST') return await sincronizar(req, db, s);
     if (caminho === '/usuarios' && m === 'GET') return await listarUsuarios(db, s);
     if (caminho === '/usuarios' && m === 'POST') return await criarUsuario(req, db, s);
+    if (caminho === '/lixeira' && m === 'GET') return await listarLixeira(db, s);
+    if (caminho === '/lixeira/restaurar' && m === 'POST') return await restaurarLixeira(req, db, s);
     const mu = caminho.match(/^\/usuarios\/([\w-]+)$/);
     if (mu && m === 'PATCH') return await alterarUsuario(req, db, s, mu[1]);
     return json({ erro: 'Rota não encontrada.' }, 404);

@@ -14,17 +14,40 @@ A identidade visual (logo, cores e regras de uso) está em [`marca/`](marca/READ
 
 1. No Netlify: **Add new project → Import an existing project → GitHub** e escolha este repositório
    e o branch a publicar. As configurações de build já estão em `netlify.toml`.
-2. No primeiro deploy o Netlify cria o banco PostgreSQL (por causa do pacote `@netlify/database`) e aplica
-   as migrações de `netlify/database/migrations/` antes de publicar. Não é preciso configurar variáveis.
+2. **Antes do primeiro deploy**, em *Site configuration › Environment variables*, crie a variável
+   **`CODIGO_CADASTRO`** com um código longo e secreto (por exemplo, 20 letras e números aleatórios).
+   Sem ela, a criação da estância fica bloqueada. Isso impede que um estranho que encontre o site antes
+   de você crie a estância e vire administrador.
+3. No primeiro deploy o Netlify cria o banco PostgreSQL (por causa do pacote `@netlify/database`) e aplica
+   as migrações de `netlify/database/migrations/` antes de publicar.
    > O Netlify Database exige um plano com créditos. Confira os limites do seu plano em
    > *Billing and usage* na documentação do Netlify antes de usar com dados reais.
-3. **Logo após o primeiro deploy, abra o site e crie a estância.** A primeira pessoa a acessar vira
-   administradora; depois disso o cadastro público é bloqueado e novos acessos são criados em
-   **Configurações › Usuários**.
-4. No iPhone: abra o site no **Safari → Compartilhar → Adicionar à Tela de Início**. O app abre em tela
+4. Abra o site e crie a estância informando o **código de cadastro**. Quem cria vira administrador;
+   depois disso o cadastro é bloqueado e novos acessos são criados em **Configurações › Usuários**.
+5. No iPhone: abra o site no **Safari → Compartilhar → Adicionar à Tela de Início**. O app abre em tela
    cheia e funciona sem sinal no campo.
 
-Observação: cada *deploy preview* do Netlify usa uma cópia do banco de produção e o link é público.
+**Deploy previews:** cada versão de teste do Netlify usa uma cópia do banco de produção e o link é público.
+Desative-as (*Site configuration › Build & deploy › Deploy Previews › None*) ou proteja com senha
+(*Site configuration › Access & security › Visitor access*) para não expor dados reais.
+
+## Segurança
+
+| Proteção | Como funciona |
+|---|---|
+| Criação da estância | Exige o código secreto `CODIGO_CADASTRO`; só é possível uma vez |
+| Senhas | Guardadas com hash scrypt (N=2^15), mínimo de 8 caracteres |
+| Força bruta | 5 senhas erradas por e-mail ou 30 por IP em 15 min bloqueiam novas tentativas por 15 min |
+| Sessões | Cookie `HttpOnly`, `Secure`, `SameSite=Lax`, válido 90 dias; só o hash do token fica no banco. Desativar usuário ou trocar senha encerra as sessões |
+| Requisições de outros sites (CSRF) | A API só aceita JSON e recusa alterações com `Origin` de outro site |
+| Permissões | Administrador gerencia usuários, backup e Lixeira; membro lança e consulta. Cada estância só vê os próprios dados |
+| Dados malformados | Todo registro é validado no servidor contra o esquema (`shared/esquema.ts`); backups importados também |
+| Recuperação | Toda alteração ou exclusão guarda a versão anterior (`registros_historico`). O administrador restaura pela **Lixeira** (90 dias) |
+| Navegador | CSP sem scripts externos ou embutidos, `X-Frame-Options: DENY`, HSTS, `Permissions-Policy` (`shared/cabecalhos.ts` e `netlify.toml`) |
+| Planilhas | A exportação CSV neutraliza fórmulas (`=`, `+`, `-`, `@`) |
+
+Testes: `npm test` (inclui ataques simulados contra a API) e `npm run teste:seguranca`
+(no navegador, com `npm run preview` rodando e banco local vazio).
 
 ## Rodar no computador
 

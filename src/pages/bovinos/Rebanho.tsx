@@ -5,7 +5,7 @@ import { Badge, BotoesLinha, Card, PageHeader, Stat, Vazio, type Tom } from '@/c
 import { Icone } from '@/components/Icone';
 import { useBovinosDerivados, type BovinoDerivado } from '@/lib/hooks';
 import { formatarIdade } from '@/lib/datas';
-import { formatarNumero, formatarNumero2 } from '@/lib/formato';
+import { celulaCsv, formatarNumero, formatarNumero2 } from '@/lib/formato';
 import { arrobas } from '@/lib/zootecnia';
 import { ModalBovino, ModalSaida } from './FormsBovino';
 import type { Bovino } from '@/types';
@@ -43,7 +43,7 @@ export default function Rebanho() {
   const exportarCSV = () => {
     const cab = ['brinco', 'nome', 'raca', 'sexo', 'nascimento', 'categoria', 'peso_kg', 'gmd', 'pasto', 'status'];
     const linhas = filtrados.map((b) => [b.brinco, b.nome ?? '', b.raca, b.sexo, b.dataNascimento, b.categoria, b.peso ?? '', b.gmd?.toFixed(3) ?? '', b.pastoNome ?? '', b.status]);
-    const csv = [cab, ...linhas].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const csv = [cab, ...linhas].map((l) => l.map(celulaCsv).join(';')).join('\n');
     const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;

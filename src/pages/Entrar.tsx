@@ -15,13 +15,17 @@ export default function Entrar({ reautenticar, onAdiar }: { reautenticar?: boole
   const [modo, setModo] = useState<Modo>(reautenticar ? 'login' : 'carregando');
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
-  const [f, setF] = useState({ nomeEstancia: '', nome: '', email: sessao?.usuario.email ?? '', senha: '', enviarLocais: false });
+  const [exigeCodigo, setExigeCodigo] = useState(false);
+  const [f, setF] = useState({ nomeEstancia: '', nome: '', email: sessao?.usuario.email ?? '', senha: '', codigo: '', enviarLocais: false });
 
   const verificar = () => {
     setModo('carregando');
     api
       .estado()
-      .then((r) => setModo(r.inicializado ? 'login' : 'cadastro'))
+      .then((r) => {
+        setExigeCodigo(!!r.exigeCodigo);
+        setModo(r.inicializado ? 'login' : 'cadastro');
+      })
       .catch(() => setModo('offline'));
   };
   useEffect(() => {
@@ -34,7 +38,9 @@ export default function Entrar({ reautenticar, onAdiar }: { reautenticar?: boole
     setEnviando(true);
     try {
       if (modo === 'cadastro') {
-        const s = await api.cadastro({ nomeEstancia: f.nomeEstancia, nome: f.nome, email: f.email, senha: f.senha });
+        const s = await api.cadastro({
+          nomeEstancia: f.nomeEstancia, nome: f.nome, email: f.email, senha: f.senha, codigo: exigeCodigo ? f.codigo : undefined,
+        });
         if (!f.enviarLocais) useFazenda.getState().limparTudo();
         useFazenda.getState().atualizarConfig({ nomeEstancia: f.nomeEstancia });
         iniciarSessao(s, { enviarDadosLocais: true });
@@ -94,6 +100,11 @@ export default function Entrar({ reautenticar, onAdiar }: { reautenticar?: boole
               <>
                 <Campo rotulo="Nome da estância"><input value={f.nomeEstancia} onChange={set('nomeEstancia')} required autoFocus /></Campo>
                 <Campo rotulo="Seu nome"><input value={f.nome} onChange={set('nome')} required autoComplete="name" /></Campo>
+                {exigeCodigo && (
+                  <Campo rotulo="Código de cadastro" dica="Definido em CODIGO_CADASTRO nas configurações do site no Netlify">
+                    <input value={f.codigo} onChange={set('codigo')} required autoComplete="off" spellCheck={false} />
+                  </Campo>
+                )}
               </>
             )}
             <Campo rotulo="E-mail"><input type="email" value={f.email} onChange={set('email')} required autoComplete="username" autoFocus={modo === 'login'} /></Campo>
